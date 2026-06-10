@@ -1,3 +1,118 @@
 <resources>
     <string name="app_name">InvenScan</string>
+
+    <!-- Login -->
+    <string name="label_server_url">Server URL</string>
+    <string name="hint_server_url">http://192.168.1.100:5000</string>
+    <string name="label_username">Username</string>
+    <string name="hint_username">User ID</string>
+    <string name="label_password">Password</string>
+    <string name="action_login">Login</string>
+    <string name="error_server_url_required">Server URL harus diisi</string>
+    <string name="error_username_required">Username harus diisi</string>
+    <string name="error_password_required">Password harus diisi</string>
+    <string name="error_invalid_url">Format URL tidak valid</string>
+
+    <!-- Home -->
+    <string name="menu_stock_in">Stock In</string>
+    <string name="menu_stock_taking">Stock Taking</string>
+    <string name="menu_stock_prep">Stock Prep</string>
+    <string name="menu_search_item">Search Item</string>
+    <string name="action_logout">Logout</string>
+    <string name="action_settings">Settings</string>
+    <string name="label_welcome">Halo, %1$s</string>
+
+    <!-- Stock In -->
+    <string name="title_stock_in">Stock In</string>
+    <string name="label_select_location">Pilih Lokasi</string>
+    <string name="label_scan_mode">Mode Scan</string>
+    <string name="label_rfid">RFID</string>
+    <string name="label_barcode">Barcode</string>
+    <string name="action_start_scan">Mulai Scan</string>
+    <string name="action_stop_scan">Stop Scan</string>
+    <string name="action_submit">Submit</string>
+    <string name="action_simulate_scan">Simulate Scan</string>
+    <string name="empty_scan_list">Belum ada item ter-scan</string>
+    <string name="label_item_count">%1$d item</string>
+    <string name="confirm_submit_stock_in">Submit %1$d item ke server?</string>
+    <string name="success_submit">Data berhasil disimpan</string>
+    <string name="success_submit_offline">Data disimpan offline, akan sync otomatis</string>
+    <string name="error_select_location">Pilih lokasi terlebih dahulu</string>
+    <string name="error_empty_scan">Tidak ada item untuk disubmit</string>
+    <string name="status_scanning">Scanning…</string>
+    <string name="status_scan_stopped">Scan dihentikan</string>
+    <string name="label_unknown_item">Item tidak dikenali</string>
+
+    <!-- Stock Taking -->
+    <string name="title_stock_taking">Stock Taking</string>
+    <string name="empty_no_active_session">Tidak ada sesi aktif saat ini</string>
+    <string name="label_session_code">Kode Sesi</string>
+    <string name="label_session_date">Tanggal</string>
+    <string name="label_session_remark">Keterangan</string>
+    <string name="action_start_session">Mulai Scan</string>
+    <string name="action_retry">Coba Lagi</string>
+
+    <!-- Stock Taking Detail -->
+    <string name="title_stock_taking_detail">Detail Stock Taking</string>
+    <string name="label_found">Ditemukan</string>
+    <string name="label_missing">Hilang</string>
+    <string name="label_unknown">Tidak Dikenal</string>
+    <string name="action_submit_result">Submit Hasil</string>
+    <string name="confirm_submit_taking">Submit hasil scan? Sesi akan tetap aktif.</string>
+    <string name="status_found">DITEMUKAN</string>
+    <string name="status_missing">HILANG</string>
+    <string name="status_unknown">TIDAK DIKENAL</string>
+
+    <!-- Stock Prep -->
+    <string name="title_stock_prep">Stock Preparation</string>
+    <string name="empty_no_prep_list">Tidak ada picking list tersedia</string>
+    <string name="label_doc_number">No. Dokumen</string>
+    <string name="label_status">Status</string>
+    <string name="label_created_at">Tanggal</string>
+
+    <!-- Stock Prep Detail -->
+    <string name="title_stock_prep_detail">Detail Picking List</string>
+    <string name="label_progress">Progress: %1$d/%2$d item</string>
+    <string name="label_requested_qty">Diminta: %1$d</string>
+    <string name="label_picked_qty">Dipick: %1$d</string>
+    <string name="empty_no_prep_items">Tidak ada item dalam picking list</string>
+    <string name="confirm_submit_prep">Submit %1$d item yang sudah dipick?</string>
+
+    <!-- Search Item -->
+    <string name="title_search_item">Search Item</string>
+    <string name="empty_search_hint">Scan barcode atau RFID untuk mencari item</string>
+    <string name="label_item_code">Kode Item</string>
+    <string name="label_item_name">Nama Item</string>
+    <string name="label_unit">Satuan</string>
+    <string name="label_location">Lokasi</string>
+    <string name="label_item_status">Status</string>
+    <string name="label_scan_history">Riwayat Scan</string>
+    <string name="empty_scan_history">Belum ada riwayat scan</string>
+    <string name="error_item_not_found">Item tidak ditemukan</string>
+
+    <!-- Settings -->
+    <string name="title_settings">Pengaturan</string>
+    <string name="label_server_url_setting">Server URL</string>
+    <string name="label_device_id">Device ID</string>
+    <string name="label_scanner_type">Tipe Scanner</string>
+    <string name="label_scanner_type_mock">Mock (Testing)</string>
+    <string name="label_scanner_type_zebra">Zebra</string>
+    <string name="label_scanner_type_honeywell">Honeywell</string>
+    <string name="label_scanner_type_denso">Denso</string>
+    <string name="label_scanner_note">Untuk integrasi hardware scanner, lihat SCANNER_INTEGRATION.md</string>
+    <string name="label_app_version">Versi Aplikasi</string>
+    <string name="action_save">Simpan</string>
+    <string name="success_settings_saved">Pengaturan berhasil disimpan</string>
+    <string name="error_server_url_empty">Server URL tidak boleh kosong</string>
+
+    <!-- Common -->
+    <string name="loading">Memuat…</string>
+    <string name="error_network">Gagal terhubung ke server. Periksa koneksi.</string>
+    <string name="error_unknown">Terjadi kesalahan, coba lagi</string>
+    <string name="error_session_expired">Sesi habis, silakan login ulang</string>
+    <string name="dialog_confirm">Konfirmasi</string>
+    <string name="dialog_yes">Ya</string>
+    <string name="dialog_no">Tidak</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Batal</string>
 </resources>

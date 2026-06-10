@@ -88,6 +88,12 @@ dependencies {
     // Security
     implementation(libs.security.crypto)
 
+    // UI
+    implementation(libs.recyclerview)
+    implementation(libs.constraintlayout)
+    implementation(libs.activity.ktx)
+    implementation(libs.fragment.ktx)
+
     // Gson
     implementation(libs.gson)
 
