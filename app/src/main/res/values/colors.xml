@@ -1,10 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorPrimary">#1565C0</color>
+    <color name="colorPrimaryDark">#003c8f</color>
+    <color name="colorPrimaryVariant">#003c8f</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorSecondary">#FF6F00</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
+    <color name="colorBackground">#FAFAFA</color>
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorOnSurface">#212121</color>
+    <color name="colorTextPrimary">#212121</color>
+    <color name="colorTextSecondary">#616161</color>
+    <color name="colorTextHint">#9E9E9E</color>
+    <color name="colorDivider">#E0E0E0</color>
+
+    <!-- Scan result states -->
+    <color name="colorFound">#2E7D32</color>
+    <color name="colorFoundBg">#E8F5E9</color>
+    <color name="colorMissing">#C62828</color>
+    <color name="colorMissingBg">#FFEBEE</color>
+    <color name="colorUnknown">#E65100</color>
+    <color name="colorUnknownBg">#FFF3E0</color>
+
+    <!-- Status badge colors -->
+    <color name="colorStatusOpen">#1565C0</color>
+    <color name="colorStatusOpenBg">#E3F2FD</color>
+    <color name="colorStatusInProgress">#E65100</color>
+    <color name="colorStatusInProgressBg">#FFF3E0</color>
+    <color name="colorStatusDone">#2E7D32</color>
+    <color name="colorStatusDoneBg">#E8F5E9</color>
+    <color name="colorStatusClosed">#616161</color>
+    <color name="colorStatusClosedBg">#F5F5F5</color>
+
+    <!-- Menu tile colors -->
+    <color name="colorTileStockIn">#1565C0</color>
+    <color name="colorTileStockTaking">#6A1B9A</color>
+    <color name="colorTileStockPrep">#00695C</color>
+    <color name="colorTileSearch">#E65100</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="error">#B00020</color>
+
+    <!-- Legacy -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
 </resources>
