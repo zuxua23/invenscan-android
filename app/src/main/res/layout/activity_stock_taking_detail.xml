@@ -70,7 +70,7 @@
                 android:layout_weight="1"
                 android:background="@color/colorFoundBg"
                 android:gravity="center"
-                android:margin="4dp"
+                android:layout_margin="4dp"
                 android:orientation="vertical"
                 android:padding="8dp">
 
@@ -97,7 +97,7 @@
                 android:layout_weight="1"
                 android:background="@color/colorMissingBg"
                 android:gravity="center"
-                android:margin="4dp"
+                android:layout_margin="4dp"
                 android:orientation="vertical"
                 android:padding="8dp">
 
@@ -124,7 +124,7 @@
                 android:layout_weight="1"
                 android:background="@color/colorUnknownBg"
                 android:gravity="center"
-                android:margin="4dp"
+                android:layout_margin="4dp"
                 android:orientation="vertical"
                 android:padding="8dp">
 
