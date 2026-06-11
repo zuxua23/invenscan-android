@@ -1,8 +1,11 @@
 package com.invenscan.app.ui.search
 
+import android.app.Activity
+import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -14,6 +17,7 @@ import com.invenscan.app.data.model.SearchItemModel
 import com.invenscan.app.databinding.ActivitySearchItemBinding
 import com.invenscan.app.scanner.ScannerContract
 import com.invenscan.app.scanner.ScannerManager
+import com.invenscan.app.ui.camera.CameraActivity
 import com.invenscan.app.ui.search.adapter.SearchHistoryAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -28,6 +32,13 @@ class SearchItemActivity : BaseActivity<ActivitySearchItemBinding>(), ScannerCon
     @Inject
     lateinit var scannerManager: ScannerManager
 
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val code = result.data?.getStringExtra(CameraActivity.EXTRA_SCANNED_CODE)
+            if (!code.isNullOrBlank()) viewModel.onScanResult(code)
+        }
+    }
+
     override fun inflateBinding() = ActivitySearchItemBinding.inflate(layoutInflater)
 
     override fun initView() {
@@ -36,6 +47,11 @@ class SearchItemActivity : BaseActivity<ActivitySearchItemBinding>(), ScannerCon
         supportActionBar?.title = getString(R.string.title_search_item)
 
         binding.rvHistory.adapter = historyAdapter
+
+        binding.fabCamera.setOnClickListener {
+            cameraLauncher.launch(Intent(this, CameraActivity::class.java))
+        }
+
         scannerManager.getScanner().initialize(this, this)
         scannerManager.getScanner().startScan()
     }
@@ -102,7 +118,7 @@ class SearchItemActivity : BaseActivity<ActivitySearchItemBinding>(), ScannerCon
     }
 
     override fun onScannerDisconnected() {
-        showError("Scanner terputus")
+        showError("Scanner disconnected")
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

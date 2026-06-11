@@ -2,11 +2,13 @@ package com.invenscan.app.ui.settings
 
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatDelegate
 import com.invenscan.app.BuildConfig
 import com.invenscan.app.R
 import com.invenscan.app.base.BaseActivity
 import com.invenscan.app.base.BaseViewModel
 import com.invenscan.app.databinding.ActivitySettingsBinding
+import com.invenscan.app.util.CustomToast
 import com.invenscan.app.util.PrefManager
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,6 +41,7 @@ class SettingsActivity : BaseActivity<ActivitySettingsBinding>() {
         binding.etDeviceId.setText(viewModel.prefManager.deviceId)
         binding.tvAppVersion.text = BuildConfig.VERSION_NAME
         binding.tvScannerNote.text = getString(R.string.label_scanner_note)
+        binding.switchDarkMode.isChecked = viewModel.prefManager.isDarkTheme
 
         binding.btnSave.setOnClickListener {
             val serverUrl = binding.etServerUrl.text.toString().trim()
@@ -50,7 +53,15 @@ class SettingsActivity : BaseActivity<ActivitySettingsBinding>() {
             val deviceId = binding.etDeviceId.text.toString().trim()
                 .ifBlank { viewModel.prefManager.deviceId }
             viewModel.save(serverUrl, deviceId)
-            showMessage(getString(R.string.success_settings_saved))
+            CustomToast.show(this, getString(R.string.success_settings_saved), CustomToast.Type.SUCCESS)
+        }
+
+        binding.switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.prefManager.isDarkTheme = isChecked
+            AppCompatDelegate.setDefaultNightMode(
+                if (isChecked) AppCompatDelegate.MODE_NIGHT_YES
+                else AppCompatDelegate.MODE_NIGHT_NO
+            )
         }
     }
 

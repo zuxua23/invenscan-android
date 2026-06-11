@@ -21,6 +21,9 @@ class LoginViewModel @Inject constructor(
     private val _loginState = MutableStateFlow<Resource<AuthResponse>?>(null)
     val loginState: StateFlow<Resource<AuthResponse>?> = _loginState
 
+    private val _connectionState = MutableStateFlow<Resource<Boolean>?>(null)
+    val connectionState: StateFlow<Resource<Boolean>?> = _connectionState
+
     fun login(serverUrl: String, userId: String, password: String) {
         val trimmedUrl = serverUrl.trim()
         val trimmedUserId = userId.trim()
@@ -33,7 +36,21 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    fun testConnection(serverUrl: String) {
+        val trimmedUrl = serverUrl.trim()
+        prefManager.serverUrl = trimmedUrl
+
+        viewModelScope.launch {
+            _connectionState.value = Resource.Loading
+            _connectionState.value = authRepository.testConnection()
+        }
+    }
+
     fun resetState() {
         _loginState.value = null
+    }
+
+    fun resetConnectionState() {
+        _connectionState.value = null
     }
 }

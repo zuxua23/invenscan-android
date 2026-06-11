@@ -1,11 +1,13 @@
 package com.invenscan.app.ui.stockin
 
+import android.app.Activity
+import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -16,7 +18,9 @@ import com.invenscan.app.data.model.LocationModel
 import com.invenscan.app.databinding.ActivityStockInBinding
 import com.invenscan.app.scanner.ScannerContract
 import com.invenscan.app.scanner.ScannerManager
+import com.invenscan.app.ui.camera.CameraActivity
 import com.invenscan.app.ui.stockin.adapter.ScannedItemAdapter
+import com.invenscan.app.util.CustomDialog
 import com.invenscan.app.util.WorkManagerUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -29,8 +33,19 @@ class StockInActivity : BaseActivity<ActivityStockInBinding>(), ScannerContract.
     private val scannedItemAdapter = ScannedItemAdapter()
     private var locations: List<LocationModel> = emptyList()
 
+    private val powerValues = listOf(5, 10, 15, 20, 25, 27, 30)
+
     @Inject
     lateinit var scannerManager: ScannerManager
+
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val code = result.data?.getStringExtra(CameraActivity.EXTRA_SCANNED_CODE)
+            if (!code.isNullOrBlank()) {
+                viewModel.onScanResult(code, ScannerContract.ScanType.BARCODE)
+            }
+        }
+    }
 
     override fun inflateBinding() = ActivityStockInBinding.inflate(layoutInflater)
 
@@ -40,21 +55,10 @@ class StockInActivity : BaseActivity<ActivityStockInBinding>(), ScannerContract.
         supportActionBar?.title = getString(R.string.title_stock_in)
 
         binding.rvScannedItems.adapter = scannedItemAdapter
+        setupPowerSpinner()
+        setupScanModeToggle()
 
-        binding.switchScanMode.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.scanMode = if (isChecked) ScannerContract.ScanType.BARCODE
-            else ScannerContract.ScanType.RFID
-            binding.tvScanModeLabel.text = if (isChecked) getString(R.string.label_barcode)
-            else getString(R.string.label_rfid)
-        }
-
-        binding.btnStartScan.setOnClickListener {
-            if (viewModel.isScanning.value) {
-                stopScanning()
-            } else {
-                startScanning()
-            }
-        }
+        binding.btnStartScan.setOnClickListener { stopScanning() }
 
         binding.btnSubmit.setOnClickListener {
             if (viewModel.scannedItems.value.isEmpty()) {
@@ -66,7 +70,43 @@ class StockInActivity : BaseActivity<ActivityStockInBinding>(), ScannerContract.
 
         binding.btnRetry.setOnClickListener { viewModel.loadLocations() }
 
+        binding.fabCamera.setOnClickListener {
+            cameraLauncher.launch(Intent(this, CameraActivity::class.java))
+        }
+
         scannerManager.getScanner().initialize(this, this)
+    }
+
+    private fun setupScanModeToggle() {
+        binding.toggleScanMode.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                val isRfid = checkedId == R.id.btnModeRfid
+                viewModel.scanMode = if (isRfid) ScannerContract.ScanType.RFID
+                else ScannerContract.ScanType.BARCODE
+                binding.spinnerPower.visibility = if (isRfid) View.VISIBLE else View.GONE
+            }
+        }
+        binding.toggleScanMode.check(R.id.btnModeRfid)
+    }
+
+    private fun setupPowerSpinner() {
+        val powerLabels = powerValues.map { "$it dBm" }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, powerLabels).apply {
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
+        binding.spinnerPower.adapter = adapter
+
+        val savedPower = prefManager.rfidPower
+        val idx = powerValues.indexOf(savedPower).coerceAtLeast(0)
+        binding.spinnerPower.setSelection(idx)
+
+        binding.spinnerPower.onItemSelectedListener =
+            object : android.widget.AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
+                    prefManager.rfidPower = powerValues[position]
+                }
+                override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+            }
     }
 
     override fun observeViewModel() {
@@ -93,6 +133,7 @@ class StockInActivity : BaseActivity<ActivityStockInBinding>(), ScannerContract.
                 binding.layoutError.visibility = View.GONE
                 locations = state.data
                 setupLocationSpinner(state.data)
+                startScanning()
             }
             is Resource.Error -> {
                 binding.progressBar.visibility = View.GONE
@@ -114,9 +155,8 @@ class StockInActivity : BaseActivity<ActivityStockInBinding>(), ScannerContract.
     private fun handleScanningState(isScanning: Boolean) {
         binding.btnStartScan.text = if (isScanning) getString(R.string.action_stop_scan)
         else getString(R.string.action_start_scan)
-        binding.tvScanStatus.text = if (isScanning) getString(R.string.status_scanning)
+        binding.tvScanHint.text = if (isScanning) getString(R.string.hint_ready_to_scan)
         else getString(R.string.status_scan_stopped)
-        binding.tvScanStatus.visibility = View.VISIBLE
     }
 
     private fun handleSubmitState(state: Resource<Unit>?) {
@@ -137,24 +177,20 @@ class StockInActivity : BaseActivity<ActivityStockInBinding>(), ScannerContract.
         }
     }
 
-    private fun setupLocationSpinner(locations: List<LocationModel>) {
-        val names = locations.map { it.locationName }
+    private fun setupLocationSpinner(locationList: List<LocationModel>) {
+        val names = locationList.map { it.locationName }
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, names).apply {
             setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
         binding.spinnerLocation.adapter = adapter
         binding.spinnerLocation.setSelection(0)
-        viewModel.selectedLocation = locations.firstOrNull()
+        viewModel.selectedLocation = locationList.firstOrNull()
 
         binding.spinnerLocation.onItemSelectedListener =
             object : android.widget.AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: android.widget.AdapterView<*>?, view: android.view.View?,
-                    position: Int, id: Long
-                ) {
-                    viewModel.selectedLocation = locations.getOrNull(position)
+                override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
+                    viewModel.selectedLocation = locationList.getOrNull(position)
                 }
-
                 override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
             }
     }
@@ -165,17 +201,21 @@ class StockInActivity : BaseActivity<ActivityStockInBinding>(), ScannerContract.
     }
 
     private fun stopScanning() {
-        scannerManager.getScanner().stopScan()
-        viewModel.setScanningState(false)
+        if (viewModel.isScanning.value) {
+            scannerManager.getScanner().stopScan()
+            viewModel.setScanningState(false)
+        } else {
+            startScanning()
+        }
     }
 
     private fun confirmAndSubmit() {
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_confirm))
-            .setMessage(getString(R.string.confirm_submit_stock_in, viewModel.scannedItems.value.size))
-            .setPositiveButton(getString(R.string.dialog_yes)) { _, _ -> viewModel.submit() }
-            .setNegativeButton(getString(R.string.dialog_no), null)
-            .show()
+        CustomDialog.show(
+            context = this,
+            title = getString(R.string.dialog_confirm),
+            message = getString(R.string.confirm_submit_stock_in, viewModel.scannedItems.value.size),
+            onPositive = { viewModel.submit() }
+        )
     }
 
     override fun onScanResult(code: String, type: ScannerContract.ScanType) {
@@ -187,7 +227,7 @@ class StockInActivity : BaseActivity<ActivityStockInBinding>(), ScannerContract.
     }
 
     override fun onScannerDisconnected() {
-        showError("Scanner terputus")
+        showError("Scanner disconnected")
         viewModel.setScanningState(false)
     }
 
@@ -198,18 +238,34 @@ class StockInActivity : BaseActivity<ActivityStockInBinding>(), ScannerContract.
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            android.R.id.home -> { onBackPressedDispatcher.onBackPressed(); true }
+            android.R.id.home -> {
+                onBackPressedDispatcher.onBackPressed()
+                true
+            }
             R.id.action_simulate_scan -> {
                 val scanner = scannerManager.getScanner()
-                if (scanner is com.invenscan.app.scanner.MockScanner && viewModel.isScanning.value) {
+                if (scanner is com.invenscan.app.scanner.MockScanner) {
                     val mockCode = "MOCK-${System.currentTimeMillis() % 10000}"
                     scanner.simulateScan(mockCode, viewModel.scanMode)
-                } else {
-                    showMessage("Mulai scan terlebih dahulu")
                 }
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onBackPressed() {
+        if (viewModel.scannedItems.value.isNotEmpty()) {
+            CustomDialog.show(
+                context = this,
+                title = getString(R.string.dialog_confirm),
+                message = getString(R.string.confirm_leave_screen),
+                positiveText = getString(R.string.dialog_leave),
+                negativeText = getString(R.string.dialog_stay),
+                onPositive = { super.onBackPressed() }
+            )
+        } else {
+            super.onBackPressed()
         }
     }
 

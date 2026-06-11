@@ -122,11 +122,11 @@ class StockOutViewModel @Inject constructor(
 
     fun submitStockOut(locationId: Long) {
         val location = selectedLocation ?: run {
-            postError("Pilih lokasi terlebih dahulu")
+            postError("Please select a location first")
             return
         }
         if (_scannedItems.value.isEmpty()) {
-            postError("Tidak ada item untuk disubmit")
+            postError("No items to submit")
             return
         }
 

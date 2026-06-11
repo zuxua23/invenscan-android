@@ -14,6 +14,16 @@ class AuthRepository @Inject constructor(
     private val prefManager: PrefManager
 ) {
 
+    suspend fun testConnection(): Resource<Boolean> {
+        return try {
+            val response = apiService.ping()
+            if (response.isSuccessful) Resource.Success(true)
+            else Resource.Error("Server responded with ${response.code()}", response.code())
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Connection failed")
+        }
+    }
+
     suspend fun login(userId: String, password: String): Resource<AuthResponse> {
         return try {
             val response = apiService.login(AuthRequest(userId, password))

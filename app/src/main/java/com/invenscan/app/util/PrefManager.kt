@@ -63,6 +63,34 @@ class PrefManager @Inject constructor(
         }
         set(value) = prefs.edit().putString(KEY_DEVICE_ID, value).apply()
 
+    var isDarkTheme: Boolean
+        get() = prefs.getBoolean(KEY_DARK_THEME, false)
+        set(value) = prefs.edit().putBoolean(KEY_DARK_THEME, value).apply()
+
+    var rfidPower: Int
+        get() = prefs.getInt(KEY_RFID_POWER, DEFAULT_RFID_POWER)
+        set(value) = prefs.edit().putInt(KEY_RFID_POWER, value).apply()
+
+    var rfidTriggerMode: String
+        get() = prefs.getString(KEY_RFID_TRIGGER_MODE, DEFAULT_RFID_TRIGGER_MODE) ?: DEFAULT_RFID_TRIGGER_MODE
+        set(value) = prefs.edit().putString(KEY_RFID_TRIGGER_MODE, value).apply()
+
+    var rfidSensitivity: Int
+        get() = prefs.getInt(KEY_RFID_SENSITIVITY, DEFAULT_RFID_SENSITIVITY)
+        set(value) = prefs.edit().putInt(KEY_RFID_SENSITIVITY, value).apply()
+
+    var rfidSession: String
+        get() = prefs.getString(KEY_RFID_SESSION, DEFAULT_RFID_SESSION) ?: DEFAULT_RFID_SESSION
+        set(value) = prefs.edit().putString(KEY_RFID_SESSION, value).apply()
+
+    var rfidQFactor: Int
+        get() = prefs.getInt(KEY_RFID_Q_FACTOR, DEFAULT_RFID_Q_FACTOR)
+        set(value) = prefs.edit().putInt(KEY_RFID_Q_FACTOR, value).apply()
+
+    var batteryDisplayMode: String
+        get() = prefs.getString(KEY_BATTERY_DISPLAY_MODE, BATTERY_MODE_SINGLE) ?: BATTERY_MODE_SINGLE
+        set(value) = prefs.edit().putString(KEY_BATTERY_DISPLAY_MODE, value).apply()
+
     val isLoggedIn: Boolean
         get() = !token.isNullOrBlank() && !serverUrl.isNullOrBlank()
 
@@ -76,7 +104,7 @@ class PrefManager @Inject constructor(
             .apply()
     }
 
-    private companion object {
+    companion object {
         const val PREFS_FILE_NAME = "invenscan_secure_prefs"
         const val KEY_TOKEN = "token"
         const val KEY_REFRESH_TOKEN = "refresh_token"
@@ -85,5 +113,21 @@ class PrefManager @Inject constructor(
         const val KEY_USER_ROLE = "user_role"
         const val KEY_SERVER_URL = "server_url"
         const val KEY_DEVICE_ID = "device_id"
+        const val KEY_DARK_THEME = "dark_theme"
+        const val KEY_RFID_POWER = "rfid_power"
+        const val KEY_RFID_TRIGGER_MODE = "rfid_trigger_mode"
+        const val KEY_RFID_SENSITIVITY = "rfid_sensitivity"
+        const val KEY_RFID_SESSION = "rfid_session"
+        const val KEY_RFID_Q_FACTOR = "rfid_q_factor"
+        const val KEY_BATTERY_DISPLAY_MODE = "battery_display_mode"
+
+        const val DEFAULT_RFID_POWER = 27
+        const val DEFAULT_RFID_TRIGGER_MODE = "Continuous"
+        const val DEFAULT_RFID_SENSITIVITY = 5
+        const val DEFAULT_RFID_SESSION = "S1"
+        const val DEFAULT_RFID_Q_FACTOR = 4
+
+        const val BATTERY_MODE_SINGLE = "SINGLE"
+        const val BATTERY_MODE_DUAL = "DUAL"
     }
 }

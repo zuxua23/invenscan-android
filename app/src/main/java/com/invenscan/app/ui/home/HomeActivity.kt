@@ -8,12 +8,14 @@ import com.invenscan.app.R
 import com.invenscan.app.base.BaseActivity
 import com.invenscan.app.databinding.ActivityHomeBinding
 import com.invenscan.app.ui.login.LoginActivity
+import com.invenscan.app.ui.rfid.RfidSettingsActivity
 import com.invenscan.app.ui.search.SearchItemActivity
 import com.invenscan.app.ui.settings.SettingsActivity
 import com.invenscan.app.ui.stockin.StockInActivity
 import com.invenscan.app.ui.stockout.StockOutActivity
 import com.invenscan.app.ui.stockprep.StockPrepActivity
 import com.invenscan.app.ui.stocktaking.StockTakingActivity
+import com.invenscan.app.util.CustomDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -45,6 +47,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>() {
         binding.cardSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
+        binding.cardRfidSettings.setOnClickListener {
+            startActivity(Intent(this, RfidSettingsActivity::class.java))
+        }
     }
 
     override fun observeViewModel() {}
@@ -61,10 +66,19 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>() {
                 true
             }
             R.id.action_logout -> {
-                viewModel.logout()
-                startActivity(Intent(this, LoginActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                })
+                CustomDialog.show(
+                    context = this,
+                    title = getString(R.string.action_logout),
+                    message = getString(R.string.confirm_logout),
+                    positiveText = getString(R.string.action_logout),
+                    negativeText = getString(R.string.dialog_cancel),
+                    onPositive = {
+                        viewModel.logout()
+                        startActivity(Intent(this, LoginActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        })
+                    }
+                )
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -1,10 +1,12 @@
 package com.invenscan.app.ui.stockprep.detail
 
+import android.app.Activity
+import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -14,7 +16,9 @@ import com.invenscan.app.base.Resource
 import com.invenscan.app.databinding.ActivityStockPrepDetailBinding
 import com.invenscan.app.scanner.ScannerContract
 import com.invenscan.app.scanner.ScannerManager
+import com.invenscan.app.ui.camera.CameraActivity
 import com.invenscan.app.ui.stockprep.detail.adapter.StockPrepDetailAdapter
+import com.invenscan.app.util.CustomDialog
 import com.invenscan.app.util.WorkManagerUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -31,6 +35,13 @@ class StockPrepDetailActivity : BaseActivity<ActivityStockPrepDetailBinding>(),
     @Inject
     lateinit var scannerManager: ScannerManager
 
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val code = result.data?.getStringExtra(CameraActivity.EXTRA_SCANNED_CODE)
+            if (!code.isNullOrBlank()) viewModel.onScanResult(code, ScannerContract.ScanType.BARCODE)
+        }
+    }
+
     override fun inflateBinding() = ActivityStockPrepDetailBinding.inflate(layoutInflater)
 
     override fun initView() {
@@ -44,15 +55,19 @@ class StockPrepDetailActivity : BaseActivity<ActivityStockPrepDetailBinding>(),
         binding.rvPickItems.adapter = detailAdapter
 
         binding.btnSubmit.setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle(getString(R.string.dialog_confirm))
-                .setMessage(getString(R.string.confirm_submit_prep, viewModel.pickedItems))
-                .setPositiveButton(getString(R.string.dialog_yes)) { _, _ -> viewModel.submit() }
-                .setNegativeButton(getString(R.string.dialog_no), null)
-                .show()
+            CustomDialog.show(
+                context = this,
+                title = getString(R.string.dialog_confirm),
+                message = getString(R.string.confirm_submit_prep, viewModel.pickedItems),
+                onPositive = { viewModel.submit() }
+            )
         }
 
         binding.btnRetry.setOnClickListener { viewModel.loadDetail(prepId) }
+
+        binding.fabCamera.setOnClickListener {
+            cameraLauncher.launch(Intent(this, CameraActivity::class.java))
+        }
 
         scannerManager.getScanner().initialize(this, this)
         viewModel.loadDetail(prepId)
@@ -75,6 +90,7 @@ class StockPrepDetailActivity : BaseActivity<ActivityStockPrepDetailBinding>(),
                                 binding.layoutError.visibility = View.GONE
                                 isScanning = true
                                 scannerManager.getScanner().startScan()
+                                binding.tvScanHint.text = getString(R.string.hint_ready_to_scan)
                             }
                             is Resource.Error -> {
                                 binding.progressBar.visibility = View.GONE
@@ -129,7 +145,7 @@ class StockPrepDetailActivity : BaseActivity<ActivityStockPrepDetailBinding>(),
     }
 
     override fun onScannerDisconnected() {
-        showError("Scanner terputus")
+        showError("Scanner disconnected")
         isScanning = false
     }
 
@@ -144,13 +160,9 @@ class StockPrepDetailActivity : BaseActivity<ActivityStockPrepDetailBinding>(),
             R.id.action_simulate_scan -> {
                 val scanner = scannerManager.getScanner()
                 if (scanner is com.invenscan.app.scanner.MockScanner && isScanning) {
-                    val unpickedItem = viewModel.pickItems.value.firstOrNull {
-                        it.pickedQty < it.detail.requestedQty
-                    }
+                    val unpickedItem = viewModel.pickItems.value.firstOrNull { it.pickedQty < it.detail.requestedQty }
                     val code = unpickedItem?.detail?.itemCode ?: "UNKNOWN-${System.currentTimeMillis() % 9999}"
                     scanner.simulateScan(code, ScannerContract.ScanType.BARCODE)
-                } else {
-                    showMessage("Tunggu data dimuat")
                 }
                 true
             }

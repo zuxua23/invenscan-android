@@ -1,10 +1,12 @@
 package com.invenscan.app.ui.stocktaking.detail
 
+import android.app.Activity
+import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -14,7 +16,9 @@ import com.invenscan.app.base.Resource
 import com.invenscan.app.databinding.ActivityStockTakingDetailBinding
 import com.invenscan.app.scanner.ScannerContract
 import com.invenscan.app.scanner.ScannerManager
+import com.invenscan.app.ui.camera.CameraActivity
 import com.invenscan.app.ui.stocktaking.detail.adapter.ScanResultAdapter
+import com.invenscan.app.util.CustomDialog
 import com.invenscan.app.util.WorkManagerUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -31,6 +35,13 @@ class StockTakingDetailActivity : BaseActivity<ActivityStockTakingDetailBinding>
     @Inject
     lateinit var scannerManager: ScannerManager
 
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val code = result.data?.getStringExtra(CameraActivity.EXTRA_SCANNED_CODE)
+            if (!code.isNullOrBlank()) viewModel.onScanResult(code)
+        }
+    }
+
     override fun inflateBinding() = ActivityStockTakingDetailBinding.inflate(layoutInflater)
 
     override fun initView() {
@@ -44,17 +55,19 @@ class StockTakingDetailActivity : BaseActivity<ActivityStockTakingDetailBinding>
         binding.rvScanResults.adapter = scanResultAdapter
 
         binding.btnSubmitResult.setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle(getString(R.string.dialog_confirm))
-                .setMessage(getString(R.string.confirm_submit_taking))
-                .setPositiveButton(getString(R.string.dialog_yes)) { _, _ ->
-                    viewModel.submitResults()
-                }
-                .setNegativeButton(getString(R.string.dialog_no), null)
-                .show()
+            CustomDialog.show(
+                context = this,
+                title = getString(R.string.dialog_confirm),
+                message = getString(R.string.confirm_submit_taking),
+                onPositive = { viewModel.submitResults() }
+            )
         }
 
         binding.btnRetry.setOnClickListener { viewModel.loadSessionTags(sttId) }
+
+        binding.fabCamera.setOnClickListener {
+            cameraLauncher.launch(Intent(this, CameraActivity::class.java))
+        }
 
         scannerManager.getScanner().initialize(this, this)
         viewModel.loadSessionTags(sttId)
@@ -124,9 +137,11 @@ class StockTakingDetailActivity : BaseActivity<ActivityStockTakingDetailBinding>
         if (start) {
             scannerManager.getScanner().startScan()
             isScanning = true
+            binding.tvScanHint.text = getString(R.string.hint_ready_to_scan)
         } else {
             scannerManager.getScanner().stopScan()
             isScanning = false
+            binding.tvScanHint.text = getString(R.string.status_scan_stopped)
         }
     }
 
@@ -139,7 +154,7 @@ class StockTakingDetailActivity : BaseActivity<ActivityStockTakingDetailBinding>
     }
 
     override fun onScannerDisconnected() {
-        showError("Scanner terputus")
+        showError("Scanner disconnected")
         isScanning = false
     }
 
@@ -155,13 +170,9 @@ class StockTakingDetailActivity : BaseActivity<ActivityStockTakingDetailBinding>
                 val scanner = scannerManager.getScanner()
                 if (scanner is com.invenscan.app.scanner.MockScanner && isScanning) {
                     val results = viewModel.scanResults.value
-                    val nextMissing = results.firstOrNull {
-                        it.status == ScanResultStatus.MISSING
-                    }
+                    val nextMissing = results.firstOrNull { it.status == ScanResultStatus.MISSING }
                     val code = nextMissing?.tagId ?: "UNKNOWN-${System.currentTimeMillis() % 9999}"
                     scanner.simulateScan(code, ScannerContract.ScanType.RFID)
-                } else {
-                    showMessage("Tunggu data dimuat")
                 }
                 true
             }

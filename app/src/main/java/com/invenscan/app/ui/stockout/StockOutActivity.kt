@@ -1,5 +1,7 @@
 package com.invenscan.app.ui.stockout
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -7,8 +9,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -21,7 +23,9 @@ import com.invenscan.app.data.model.LocationModel
 import com.invenscan.app.databinding.ActivityStockOutBinding
 import com.invenscan.app.scanner.ScannerContract
 import com.invenscan.app.scanner.ScannerManager
+import com.invenscan.app.ui.camera.CameraActivity
 import com.invenscan.app.ui.stockout.adapter.StockOutAdapter
+import com.invenscan.app.util.CustomDialog
 import com.invenscan.app.util.WorkManagerUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -34,8 +38,19 @@ class StockOutActivity : BaseActivity<ActivityStockOutBinding>(), ScannerContrac
     private val stockOutAdapter = StockOutAdapter()
     private var locations: List<LocationModel> = emptyList()
 
+    private val powerValues = listOf(5, 10, 15, 20, 25, 27, 30)
+
     @Inject
     lateinit var scannerManager: ScannerManager
+
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val code = result.data?.getStringExtra(CameraActivity.EXTRA_SCANNED_CODE)
+            if (!code.isNullOrBlank()) {
+                viewModel.onScanResult(code, ScannerContract.ScanType.BARCODE)
+            }
+        }
+    }
 
     override fun inflateBinding() = ActivityStockOutBinding.inflate(layoutInflater)
 
@@ -46,13 +61,8 @@ class StockOutActivity : BaseActivity<ActivityStockOutBinding>(), ScannerContrac
 
         binding.rvScannedItems.adapter = stockOutAdapter
         setupSwipeToDelete()
-
-        binding.switchScanMode.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.scanMode = if (isChecked) ScannerContract.ScanType.BARCODE
-            else ScannerContract.ScanType.RFID
-            binding.tvScanModeLabel.text = if (isChecked) getString(R.string.label_barcode)
-            else getString(R.string.label_rfid)
-        }
+        setupPowerSpinner()
+        setupScanModeToggle()
 
         binding.btnStartScan.setOnClickListener {
             if (viewModel.isScanning.value) stopScanning() else startScanning()
@@ -68,7 +78,39 @@ class StockOutActivity : BaseActivity<ActivityStockOutBinding>(), ScannerContrac
 
         binding.btnRetry.setOnClickListener { viewModel.loadLocations() }
 
+        binding.fabCamera.setOnClickListener {
+            cameraLauncher.launch(Intent(this, CameraActivity::class.java))
+        }
+
         scannerManager.getScanner().initialize(this, this)
+    }
+
+    private fun setupScanModeToggle() {
+        binding.toggleScanMode.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                val isRfid = checkedId == R.id.btnModeRfid
+                viewModel.scanMode = if (isRfid) ScannerContract.ScanType.RFID
+                else ScannerContract.ScanType.BARCODE
+                binding.spinnerPower.visibility = if (isRfid) View.VISIBLE else View.GONE
+            }
+        }
+        binding.toggleScanMode.check(R.id.btnModeRfid)
+    }
+
+    private fun setupPowerSpinner() {
+        val powerLabels = powerValues.map { "$it dBm" }
+        binding.spinnerPower.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, powerLabels).apply {
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
+        val idx = powerValues.indexOf(prefManager.rfidPower).coerceAtLeast(0)
+        binding.spinnerPower.setSelection(idx)
+
+        binding.spinnerPower.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
+                prefManager.rfidPower = powerValues[position]
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+        }
     }
 
     override fun observeViewModel() {
@@ -95,6 +137,7 @@ class StockOutActivity : BaseActivity<ActivityStockOutBinding>(), ScannerContrac
                 binding.layoutError.visibility = View.GONE
                 locations = state.data
                 setupLocationSpinner(state.data)
+                startScanning()
             }
             is Resource.Error -> {
                 binding.progressBar.visibility = View.GONE
@@ -116,9 +159,8 @@ class StockOutActivity : BaseActivity<ActivityStockOutBinding>(), ScannerContrac
     private fun handleScanningState(isScanning: Boolean) {
         binding.btnStartScan.text = if (isScanning) getString(R.string.action_stop_scan)
         else getString(R.string.action_start_scan)
-        binding.tvScanStatus.text = if (isScanning) getString(R.string.status_scanning)
+        binding.tvScanHint.text = if (isScanning) getString(R.string.hint_ready_to_scan)
         else getString(R.string.status_scan_stopped)
-        binding.tvScanStatus.visibility = View.VISIBLE
     }
 
     private fun handleSubmitState(state: Resource<Unit>?) {
@@ -150,13 +192,9 @@ class StockOutActivity : BaseActivity<ActivityStockOutBinding>(), ScannerContrac
 
         binding.spinnerLocation.onItemSelectedListener =
             object : android.widget.AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: android.widget.AdapterView<*>?, view: android.view.View?,
-                    position: Int, id: Long
-                ) {
+                override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
                     viewModel.selectedLocation = locs.getOrNull(position)
                 }
-
                 override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
             }
     }
@@ -164,23 +202,15 @@ class StockOutActivity : BaseActivity<ActivityStockOutBinding>(), ScannerContrac
     private fun setupSwipeToDelete() {
         val swipeBackground = ColorDrawable(Color.parseColor("#FCEBEB"))
         val callback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-            override fun onMove(
-                rv: RecyclerView, vh: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
-            ) = false
+            override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) = false
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 viewModel.removeItem(viewHolder.adapterPosition)
             }
 
-            override fun onChildDraw(
-                c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
-                dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean
-            ) {
+            override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
                 val itemView = viewHolder.itemView
-                swipeBackground.setBounds(
-                    itemView.right + dX.toInt(), itemView.top,
-                    itemView.right, itemView.bottom
-                )
+                swipeBackground.setBounds(itemView.right + dX.toInt(), itemView.top, itemView.right, itemView.bottom)
                 swipeBackground.draw(c)
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
             }
@@ -203,14 +233,12 @@ class StockOutActivity : BaseActivity<ActivityStockOutBinding>(), ScannerContrac
             showError(getString(R.string.error_select_location))
             return
         }
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_confirm))
-            .setMessage(getString(R.string.confirm_submit_stock_out, viewModel.scannedItems.value.size))
-            .setPositiveButton(getString(R.string.dialog_yes)) { _, _ ->
-                viewModel.submitStockOut(locationId)
-            }
-            .setNegativeButton(getString(R.string.dialog_no), null)
-            .show()
+        CustomDialog.show(
+            context = this,
+            title = getString(R.string.dialog_confirm),
+            message = getString(R.string.confirm_submit_stock_out, viewModel.scannedItems.value.size),
+            onPositive = { viewModel.submitStockOut(locationId) }
+        )
     }
 
     override fun onScanResult(code: String, type: ScannerContract.ScanType) {
@@ -222,7 +250,7 @@ class StockOutActivity : BaseActivity<ActivityStockOutBinding>(), ScannerContrac
     }
 
     override fun onScannerDisconnected() {
-        showError("Scanner terputus")
+        showError("Scanner disconnected")
         viewModel.stopScan()
     }
 
@@ -236,15 +264,28 @@ class StockOutActivity : BaseActivity<ActivityStockOutBinding>(), ScannerContrac
             android.R.id.home -> { onBackPressedDispatcher.onBackPressed(); true }
             R.id.action_simulate_scan -> {
                 val scanner = scannerManager.getScanner()
-                if (scanner is com.invenscan.app.scanner.MockScanner && viewModel.isScanning.value) {
+                if (scanner is com.invenscan.app.scanner.MockScanner) {
                     val mockCode = "MOCK-OUT-${System.currentTimeMillis() % 10000}"
                     scanner.simulateScan(mockCode, viewModel.scanMode)
-                } else {
-                    showMessage("Mulai scan terlebih dahulu")
                 }
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onBackPressed() {
+        if (viewModel.scannedItems.value.isNotEmpty()) {
+            CustomDialog.show(
+                context = this,
+                title = getString(R.string.dialog_confirm),
+                message = getString(R.string.confirm_leave_screen),
+                positiveText = getString(R.string.dialog_leave),
+                negativeText = getString(R.string.dialog_stay),
+                onPositive = { super.onBackPressed() }
+            )
+        } else {
+            super.onBackPressed()
         }
     }
 
