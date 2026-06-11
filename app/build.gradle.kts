@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.invenscan.app"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.invenscan.app"
         minSdk = 21
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
