@@ -43,6 +43,12 @@
     <string name="status_scan_stopped">Scan dihentikan</string>
     <string name="label_unknown_item">Item tidak dikenali</string>
 
+    <!-- Stock Out -->
+    <string name="title_stock_out">Stock Out</string>
+    <string name="menu_stock_out">Stock Out</string>
+    <string name="confirm_submit_stock_out">Submit %1$d item stock out ke server?</string>
+    <string name="success_submit_stock_out_offline">Data stock out disimpan, akan sync otomatis</string>
+
     <!-- Stock Taking -->
     <string name="title_stock_taking">Stock Taking</string>
     <string name="empty_no_active_session">Tidak ada sesi aktif saat ini</string>

@@ -38,6 +38,11 @@
             android:windowSoftInputMode="adjustPan" />
 
         <activity
+            android:name=".ui.stockout.StockOutActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
             android:name=".ui.stocktaking.StockTakingActivity"
             android:exported="false" />
 

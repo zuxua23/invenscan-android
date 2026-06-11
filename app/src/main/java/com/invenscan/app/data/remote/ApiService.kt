@@ -9,6 +9,9 @@ import com.invenscan.app.data.model.SearchItemModel
 import com.invenscan.app.data.model.StockInBulkInfoRequest
 import com.invenscan.app.data.model.StockInSubmitRequest
 import com.invenscan.app.data.model.StockInTagInfo
+import com.invenscan.app.data.model.StockOutBulkInfoRequest
+import com.invenscan.app.data.model.StockOutSubmitRequest
+import com.invenscan.app.data.model.StockOutTagInfo
 import com.invenscan.app.data.model.StockPrepDetailModel
 import com.invenscan.app.data.model.StockPrepModel
 import com.invenscan.app.data.model.StockPrepSubmitRequest
@@ -73,6 +76,20 @@ interface ApiService {
 
     @POST("api/stockin/bulk-info")
     suspend fun getStockInBulkInfo(@Body request: StockInBulkInfoRequest): Response<ApiResponse<List<StockInTagInfo>>>
+
+    // ── Stock Out ─────────────────────────────────────────────────
+
+    @GET("api/stockout")
+    suspend fun lookupStockOutTag(
+        @Query("code") code: String,
+        @Query("scannerType") scannerType: String
+    ): Response<ApiResponse<StockOutTagInfo>>
+
+    @POST("api/stockout")
+    suspend fun submitStockOut(@Body request: StockOutSubmitRequest): Response<ApiResponse<Unit>>
+
+    @POST("api/stockout/bulk-info")
+    suspend fun getStockOutBulkInfo(@Body request: StockOutBulkInfoRequest): Response<ApiResponse<List<StockOutTagInfo>>>
 
     // ── Stock Taking ──────────────────────────────────────────────
 

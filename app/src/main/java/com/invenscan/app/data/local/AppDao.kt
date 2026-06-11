@@ -10,6 +10,7 @@ import com.invenscan.app.data.local.entity.PendingSubmitEntity
 import com.invenscan.app.data.local.entity.ScanQueueEntity
 import com.invenscan.app.data.local.entity.SearchItemEntity
 import com.invenscan.app.data.local.entity.StockInScanEntity
+import com.invenscan.app.data.local.entity.StockOutScanEntity
 import com.invenscan.app.data.local.entity.SyncStatus
 import com.invenscan.app.data.local.entity.TagCacheEntity
 import kotlinx.coroutines.flow.Flow
@@ -67,6 +68,23 @@ interface AppDao {
 
     @Query("SELECT * FROM stock_in_scan WHERE docNumber = :docNumber ORDER BY scannedAt DESC")
     fun getStockInScansByDocument(docNumber: String): Flow<List<StockInScanEntity>>
+
+    // ── StockOutScan (Stock Out offline) ──────────────────────────
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertStockOutScan(entity: StockOutScanEntity): Long
+
+    @Query("SELECT * FROM stock_out_scan WHERE syncStatus = 'PENDING' ORDER BY createdAt ASC")
+    suspend fun getPendingStockOutScans(): List<StockOutScanEntity>
+
+    @Query("UPDATE stock_out_scan SET syncStatus = :status WHERE id = :id")
+    suspend fun updateStockOutSyncStatus(id: Long, status: String)
+
+    @Query("DELETE FROM stock_out_scan WHERE id = :id")
+    suspend fun deleteStockOutScan(id: Long)
+
+    @Query("SELECT * FROM stock_out_scan WHERE docNumber = :docNumber ORDER BY createdAt DESC")
+    suspend fun getStockOutScansByDoc(docNumber: String): List<StockOutScanEntity>
 
     // ── SearchItemCache ────────────────────────────────────────────
 

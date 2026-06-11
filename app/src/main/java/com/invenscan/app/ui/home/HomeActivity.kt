@@ -11,6 +11,7 @@ import com.invenscan.app.ui.login.LoginActivity
 import com.invenscan.app.ui.search.SearchItemActivity
 import com.invenscan.app.ui.settings.SettingsActivity
 import com.invenscan.app.ui.stockin.StockInActivity
+import com.invenscan.app.ui.stockout.StockOutActivity
 import com.invenscan.app.ui.stockprep.StockPrepActivity
 import com.invenscan.app.ui.stocktaking.StockTakingActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,6 +30,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>() {
         binding.cardStockIn.setOnClickListener {
             startActivity(Intent(this, StockInActivity::class.java))
         }
+        binding.cardStockOut.setOnClickListener {
+            startActivity(Intent(this, StockOutActivity::class.java))
+        }
         binding.cardStockTaking.setOnClickListener {
             startActivity(Intent(this, StockTakingActivity::class.java))
         }
@@ -37,6 +41,9 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>() {
         }
         binding.cardSearchItem.setOnClickListener {
             startActivity(Intent(this, SearchItemActivity::class.java))
+        }
+        binding.cardSettings.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
     }
 
