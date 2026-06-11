@@ -1415,3 +1415,840 @@ packaging rapi sesuai standar CodeCanyon.
 5. MockScanner WAJIB berfungsi penuh untuk demo dan testing
    tanpa hardware apapun.
 ```
+
+---
+
+# DESIGN SYSTEM — InvenScan
+
+## Color Tokens
+
+### Primary Palette
+```xml
+<!-- Android colors.xml -->
+<color name="navy">#1A2332</color>
+<color name="teal_primary">#1D9E75</color>
+<color name="teal_light">#5DCAA5</color>
+<color name="teal_bg">#E1F5EE</color>
+<color name="surface">#F8FAFC</color>
+<color name="white">#FFFFFF</color>
+
+<!-- Status Colors -->
+<color name="danger">#E24B4A</color>
+<color name="danger_bg">#FCEBEB</color>
+<color name="warning">#EF9F27</color>
+<color name="warning_bg">#FAEEDA</color>
+<color name="success">#1D9E75</color>
+<color name="success_bg">#E1F5EE</color>
+
+<!-- Text -->
+<color name="text_primary">#1A2332</color>
+<color name="text_secondary">#5A6A7A</color>
+<color name="text_hint">#888888</color>
+
+<!-- Border -->
+<color name="border_default">#EEF2F5</color>
+<color name="border_light">#F0F0F0</color>
+```
+
+### CSS Variables (Web ASP.NET Razor)
+```css
+:root {
+  --navy: #1A2332;
+  --teal: #1D9E75;
+  --teal-light: #5DCAA5;
+  --teal-bg: #E1F5EE;
+  --surface: #F8FAFC;
+  --danger: #E24B4A;
+  --danger-bg: #FCEBEB;
+  --warning: #EF9F27;
+  --warning-bg: #FAEEDA;
+  --text-primary: #1A2332;
+  --text-secondary: #5A6A7A;
+  --text-hint: #888888;
+  --border: #EEF2F5;
+  --white: #FFFFFF;
+}
+```
+
+---
+
+## Typography
+
+### Android (styles.xml)
+```xml
+<!-- Heading -->
+<style name="TextHeading">
+    <item name="android:textSize">18sp</item>
+    <item name="android:textColor">@color/text_primary</item>
+    <item name="android:textStyle">bold</item>
+</style>
+
+<!-- Title -->
+<style name="TextTitle">
+    <item name="android:textSize">14sp</item>
+    <item name="android:textColor">@color/text_primary</item>
+    <item name="android:textStyle">bold</item>
+</style>
+
+<!-- Body -->
+<style name="TextBody">
+    <item name="android:textSize">13sp</item>
+    <item name="android:textColor">@color/text_primary</item>
+</style>
+
+<!-- Caption -->
+<style name="TextCaption">
+    <item name="android:textSize">11sp</item>
+    <item name="android:textColor">@color/text_hint</item>
+</style>
+```
+
+### Web (Bootstrap 5 override)
+```css
+h1, h2, h3 { color: var(--navy); font-weight: 500; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-hint { color: var(--text-hint); font-size: 12px; }
+body { font-size: 14px; color: var(--text-primary); }
+```
+
+---
+
+## Android UI Components
+
+### TopBar / Toolbar
+```xml
+<androidx.appcompat.widget.Toolbar
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/white"
+    android:elevation="2dp"
+    app:titleTextColor="@color/text_primary"
+    app:titleTextAppearance="@style/TextTitle"/>
+
+<!-- Bottom border -->
+<View
+    android:layout_width="match_parent"
+    android:layout_height="0.5dp"
+    android:background="@color/border_default"/>
+```
+
+### Card
+```xml
+<com.google.android.material.card.MaterialCardView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/border_default"
+    app:strokeWidth="0.5dp">
+```
+
+### Primary Button (Scan / Submit)
+```xml
+<com.google.android.material.button.MaterialButton
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:layout_margin="12dp"
+    android:textSize="14sp"
+    android:textStyle="bold"
+    app:backgroundTint="@color/teal_primary"
+    app:cornerRadius="10dp"/>
+```
+
+### Badge / Status Chip
+```xml
+<!-- Found / Success -->
+<TextView
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="3dp"
+    android:background="@drawable/bg_badge_teal"
+    android:textColor="@color/teal_primary"
+    android:textSize="11sp"
+    android:textStyle="bold"/>
+
+<!-- Missing / Danger -->
+<TextView
+    android:background="@drawable/bg_badge_danger"
+    android:textColor="@color/danger"/>
+
+<!-- Pending / Warning -->
+<TextView
+    android:background="@drawable/bg_badge_warning"
+    android:textColor="@color/warning"/>
+```
+
+### Scan Area (Dashed Border)
+```xml
+<LinearLayout
+    android:layout_margin="12dp"
+    android:padding="16dp"
+    android:background="@drawable/bg_scan_area"
+    android:gravity="center"
+    android:orientation="vertical">
+    <!-- bg_scan_area = rounded rect, dashed border teal, bg teal_bg -->
+</LinearLayout>
+```
+
+### Stat Card (Stock Taking Counter)
+```xml
+<LinearLayout
+    android:layout_weight="1"
+    android:background="@drawable/bg_card"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="10dp">
+    <TextView
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@color/teal_primary"/>
+    <TextView
+        android:textSize="11sp"
+        android:textColor="@color/text_hint"/>
+</LinearLayout>
+```
+
+### List Item (Scan Result)
+```xml
+<LinearLayout
+    android:padding="12dp"
+    android:background="@color/white"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <!-- Status dot -->
+    <View
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:background="@drawable/dot_teal"/>
+
+    <!-- Item info -->
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_marginStart="10dp"
+        android:orientation="vertical">
+        <TextView style="@style/TextTitle"/>
+        <TextView style="@style/TextCaption"/>
+    </LinearLayout>
+
+    <!-- Badge -->
+    <TextView ... />
+</LinearLayout>
+```
+
+### Sync Status Bar
+```xml
+<LinearLayout
+    android:layout_margin="12dp"
+    android:padding="10dp"
+    android:background="@drawable/bg_teal_light_rounded"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:gap="8dp">
+    <ImageView android:src="@drawable/ic_wifi"/>
+    <TextView
+        android:text="Synced · 2 min ago"
+        android:textSize="11sp"
+        android:textColor="@color/teal_primary"/>
+</LinearLayout>
+```
+
+---
+
+## Android Screen Specs
+
+### Home Screen
+```
+Background: surface (#F8FAFC)
+TopBar: white, navy title "InvenScan", settings icon kanan
+Welcome text: hint color name operator
+Menu grid: 2x2, card putih border tipis
+  - Tiap card: teal icon 24dp center + label 11sp bold
+Icons: ic_package, ic_clipboard_check, ic_list_check, ic_search
+Sync bar: teal_bg rounded, wifi icon + text
+```
+
+### Stock Taking Detail Screen
+```
+Background: surface
+TopBar: back arrow + "Stock taking"
+Stat row: 3 equal cards (Found=teal, Missing=danger, Unknown=warning)
+Scan area: dashed teal border, teal_bg fill, scan icon center
+List: putih bg, separator border_light
+  - Green dot = found, red dot = missing, amber dot = unknown
+  - Badge kanan: teal/danger/warning
+Submit button: teal full width, bottom fixed
+```
+
+### Stock In Screen
+```
+Background: surface
+TopBar: back arrow + "Stock in"
+Location spinner: card style, chevron icon
+Toggle RFID/Barcode: teal accent
+Start/Stop button: teal full width
+RecyclerView: list item style di atas
+Submit FAB atau bottom button: teal
+```
+
+### Search Item Screen
+```
+Background: surface
+TopBar: back arrow + "Search item"
+Scan area: center screen, large
+Result card: item detail (nama, kode, lokasi, qty, status)
+History list: bawah result card
+```
+
+### Settings Screen
+```
+Background: surface
+Grouped list style
+  Group 1: Server URL input, Device ID input
+  Group 2: Scanner type info (label only)
+  Group 3: App version
+Save button: teal full width bottom
+```
+
+---
+
+## Web Dashboard Specs (Bootstrap 5 + DataTables)
+
+### Layout Structure
+```
+Navbar (navy bg #1A2332)
+  - Brand: teal dot + "InvenScan" white
+  - Nav items: muted color, active = teal
+
+Sidebar (surface bg #F8FAFC)
+  - Border right 0.5px border_default
+  - Item: icon 15px + label 13px, text_secondary
+  - Active: teal_bg bg + teal text + left border 2px teal + bold
+
+Content Area
+  - Padding 20px
+  - Title 14px bold navy
+```
+
+### KPI Cards
+```
+Background: surface (#F8FAFC)
+Border: 0.5px border_default
+Border radius: 8px
+Padding: 12px
+Value: 20px bold (teal = normal, warning = pending, danger = error)
+Label: 11px text_hint
+Grid: 4 columns desktop, 2 columns mobile
+```
+
+### Tables (DataTables)
+```
+Header: text_hint 12px, border-bottom border_default
+Row: 13px text_primary, border-bottom border_light
+Hover: surface bg
+Badge in table: same spec as Android badge
+```
+
+### Forms
+```
+Input: border 0.5px border_default, radius 8px, 36px height
+Focus: border teal_primary
+Label: 12px text_secondary, margin-bottom 4px
+Submit button: teal bg, white text, radius 8px
+```
+
+### Status Badges (Web)
+```css
+.badge-teal    { background: #E1F5EE; color: #0F6E56; }
+.badge-danger  { background: #FCEBEB; color: #A32D2D; }
+.badge-warning { background: #FAEEDA; color: #854F0B; }
+.badge-gray    { background: #F1EFE8; color: #5F5E5A; }
+/* padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500 */
+```
+
+---
+
+## Drawables Reference (Android)
+
+```
+bg_card              → white, stroke 0.5dp border_default, radius 12dp
+bg_badge_teal        → teal_bg fill, radius 20dp
+bg_badge_danger      → danger_bg fill, radius 20dp
+bg_badge_warning     → warning_bg fill, radius 20dp
+bg_scan_area         → teal_bg fill, dashed stroke teal_light 1.5dp, radius 10dp
+bg_teal_light_rounded → teal_bg fill, radius 8dp
+dot_teal             → circle teal_primary 8dp
+dot_danger           → circle danger 8dp
+dot_warning          → circle warning 8dp
+```
+
+---
+
+## Design Rules (WAJIB diikuti)
+
+```
+1. JANGAN pakai elevation/shadow — gunakan border tipis 0.5dp
+2. Tombol aksi utama SELALU teal_primary
+3. Status SELALU pakai 3 warna: teal=ok, warning=pending, danger=error
+4. Background screen SELALU surface (#F8FAFC), bukan pure white
+5. TopBar/Toolbar SELALU white dengan bottom border tipis
+6. Font size minimum 11sp Android / 11px web
+7. Scan area SELALU pakai dashed border style
+8. List item SELALU ada status dot di kiri
+9. Card SELALU 0dp elevation, border 0.5dp
+10. Sidebar web active state: teal_bg + left border 2dp teal
+```
+
+---
+
+# STOCK OUT FEATURE — Missing Feature Patch
+
+## Database Addition
+
+```sql
+-- tb_StockOut
+tb_StockOut: Id, DocNumber, LocationId(FK), Notes,
+             CreatedBy, CreatedAt, Status (PENDING/SYNCED)
+
+-- tb_StockOutDetail
+tb_StockOutDetail: Id, StockOutId(FK), TagId(FK),
+                   ItemId(FK), ScannedCode,
+                   ScanType (RFID/BARCODE), CreatedAt
+```
+
+## Backend Additions
+
+```
+StockOutController (API):
+GET  /api/stockout?code={code}&scannerType={type}
+POST /api/stockout
+POST /api/stockout/bulk-info
+
+StockOutWebController (Web):
+GET  /stockout       → list history (DataTables)
+GET  /stockout/{id}  → detail dokumen + item list
+
+Service:
+IStockOutService + StockOutService
+- GetByCode(code, scannerType) → lookup tag → return item info
+- Submit(dto) → save StockOut + StockOutDetail + update Tag status = OUT
+- BulkInfo(codes[]) → lookup multiple tags sekaligus
+```
+
+## Android Additions
+
+```
+StockOutScanEntity  → Room entity untuk offline queue
+StockOutRepository  → local + remote
+StockOutViewModel
+StockOutActivity    → same pattern as StockInActivity
+layout_activity_stock_out.xml
+
+HomeActivity update:
+→ Grid jadi 2x3 (tambah Stock Out)
+→ Icon: ti-package-export
+
+SyncWorker update:
+→ Add sync block for StockOutScanEntity
+```
+
+## Stock Out Screen Spec (Android)
+
+```
+Same pattern as Stock In:
+- Background: surface #F8FAFC
+- TopBar: white + bottom border
+- Location spinner: card style
+- Toggle RFID/Barcode
+- Start/Stop scan button: teal
+- RecyclerView: list item ter-scan
+  dot merah (OUT) + item name + badge "OUT"
+- Submit button: teal full width bottom
+- Offline queue + WorkManager sync
+```
+
+## Prompt — Backend Stock Out
+
+```
+Read CLAUDE.md, use SONNET.
+
+Add Stock Out feature to InvenScan backend.
+
+1. Add Entity classes:
+   - StockOut: Id, DocNumber, LocationId(FK), Notes,
+     CreatedBy, CreatedAt, Status(PENDING/SYNCED)
+   - StockOutDetail: Id, StockOutId(FK), TagId(FK),
+     ItemId(FK), ScannedCode, ScanType, CreatedAt
+
+2. Add to AppDBContext + create EF migration
+
+3. IStockOutService interface + StockOutService implementation:
+   - GetByCode(code, scannerType) → lookup tag → return item info
+   - Submit(StockOutDto) → save header + details + 
+     update Tag.Status = OUT
+   - BulkInfo(string[] codes) → lookup multiple tags
+
+4. StockOutController (API):
+   GET  /api/stockout?code={code}&scannerType={type}
+   POST /api/stockout
+   POST /api/stockout/bulk-info
+   → Same pattern as StockInController
+
+5. StockOutWebController + Views:
+   - Index.cshtml → DataTables list semua stock out history
+   - Detail.cshtml → detail dokumen + item list
+   - Tambah "Stock Out" di sidebar _Layout.cshtml
+     dengan icon ti-package-export
+
+Follow DESIGN SYSTEM dari CLAUDE.md.
+Do not wait for confirmation, run sequentially.
+```
+
+## Prompt — Android Stock Out
+
+```
+Read CLAUDE.md, use SONNET.
+
+Add Stock Out feature to InvenScan Android.
+
+1. Add Room Entity:
+   StockOutScanEntity (same pattern as StockInScanEntity):
+   id, docNumber, locationId, tagId, itemId,
+   scannedCode, scanType, syncStatus, createdAt
+
+2. Add AppDao queries for StockOutScanEntity:
+   - insertStockOutScan()
+   - getPendingStockOutScans()
+   - updateStockOutSyncStatus()
+   - deleteStockOutScan()
+
+3. Add ApiService endpoints:
+   GET  /api/stockout
+   POST /api/stockout
+   POST /api/stockout/bulk-info
+
+4. StockOutRepository:
+   - scanItem(code, scannerType) → remote + local cache
+   - submitStockOut(dto) → remote, fallback to local queue
+   - getPendingSync() → local queue
+
+5. StockOutViewModel:
+   - locationList: StateFlow<List<Location>>
+   - scanResult: StateFlow<Resource<ItemInfo>>
+   - scannedItems: StateFlow<List<StockOutScanEntity>>
+   - submitResult: StateFlow<Resource<Boolean>>
+
+6. StockOutActivity + layout_activity_stock_out.xml:
+   - Spinner: pilih lokasi (fetch /api/location)
+   - Toggle switch: RFID / Barcode mode
+   - Start/Stop scan button (teal)
+   - RecyclerView: list item ter-scan
+     dot merah + item name + kode + badge "OUT"
+   - Submit button: teal full width fixed bottom
+   - Loading, empty, error state wajib ada
+   - Offline queue ke StockOutScanEntity kalau gagal
+
+7. Update HomeActivity:
+   - Grid layout jadi 2 kolom x 3 baris
+   - Tambah menu Stock Out
+   - Icon: package-export atau arrow-up
+   - Urutan: Stock In, Stock Out, Stock Taking,
+     Stock Prep, Search Item, Settings
+
+8. Update SyncWorker:
+   - Add sync block untuk StockOutScanEntity
+   - Same retry pattern as StockInScanEntity
+
+Follow DESIGN SYSTEM dari CLAUDE.md.
+Do not wait for confirmation, run sequentially.
+```
+
+---
+
+# STOCK OUT — GATE READER FEATURE
+
+## Overview
+
+Stock Out punya 2 mode:
+```
+Mode 1: Gate Reader (Web)
+→ RFID reader fixed di gate kirim data ke server via API
+→ Abstract endpoint — buyer define format sesuai reader mereka
+→ Web dashboard tampil real-time log
+→ Admin bisa review / void
+
+Mode 2: Android HT
+→ Operator scan manual pakai HT
+→ Offline-first + WorkManager sync
+→ Same pattern as Stock In
+```
+
+---
+
+## Gate Reader — Abstract Endpoint Design
+
+### Konsep
+```
+Buyer punya reader brand apapun (Impinj, Zebra FX, Zebra FR, dll)
+→ Mereka configure reader untuk hit endpoint kita
+→ Kita terima data, normalize, proses
+
+Endpoint fleksibel:
+→ Terima format apapun (JSON flat, JSON nested, XML)
+→ Field mapping di-configure via web dashboard
+→ Buyer tinggal map field reader mereka ke field kita
+```
+
+### Gate Config Table (Database)
+```sql
+tb_GateConfig: 
+  Id, GateName, GateCode, LocationId(FK),
+  ApiKey (untuk auth reader),
+  FieldMapping (JSON string — map field reader ke field kita),
+  IsActive, CreatedAt
+
+-- Contoh FieldMapping:
+-- { "epc": "EPC", "antenna": "AntennaPort", "timestamp": "ReadTime" }
+-- Buyer isi ini di web dashboard sesuai format reader mereka
+```
+
+### Gate Reader Endpoint
+```
+POST /api/gate/stockout
+Headers: X-Gate-Api-Key: {apiKey}
+
+Body: flexible — terima apapun yang reader kirim
+Contoh format A (Impinj Octane):
+{
+  "EPC": "E2003412B12",
+  "AntennaPort": 1,
+  "ReadTime": "2026-06-11T09:41:00Z"
+}
+
+Contoh format B (Zebra FX):
+{
+  "tag_id": "E2003412B12",
+  "reader_name": "gate-01",
+  "timestamp": 1718094060
+}
+
+Server normalize via FieldMapping dari GateConfig
+→ extract EPC → process stock out
+```
+
+### Processing Flow
+```
+Reader hit /api/gate/stockout
+    ↓
+Validate X-Gate-Api-Key → cari GateConfig
+    ↓
+Parse body → normalize via FieldMapping
+    ↓
+Extract EPC list
+    ↓
+Lookup Tag di database
+    ↓
+Create StockOut record (auto, CreatedBy = "GATE-{GateCode}")
+    ↓
+Update Tag.Status = OUT
+    ↓
+Push ke real-time log (SignalR atau polling)
+    ↓
+Return: { processed: N, unknown: M }
+```
+
+---
+
+## Backend Additions — Gate Reader
+
+### New Entity
+```csharp
+// GateConfig.cs
+public class GateConfig {
+    public int Id { get; set; }
+    public string GateName { get; set; }
+    public string GateCode { get; set; }
+    public int LocationId { get; set; }
+    public string ApiKey { get; set; }        // generated UUID
+    public string FieldMapping { get; set; }  // JSON string
+    public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public Location Location { get; set; }
+}
+
+// GateLog.cs (real-time log)
+public class GateLog {
+    public int Id { get; set; }
+    public int GateConfigId { get; set; }
+    public string EpcTag { get; set; }
+    public string ItemName { get; set; }
+    public string RawPayload { get; set; }    // simpan raw request
+    public string Status { get; set; }        // PROCESSED/UNKNOWN/VOID
+    public DateTime ScannedAt { get; set; }
+    public GateConfig GateConfig { get; set; }
+}
+```
+
+### New Controllers
+```
+GateController (API — untuk reader):
+POST /api/gate/stockout
+→ Auth via X-Gate-Api-Key header (bukan JWT)
+→ Accept [FromBody] dynamic / JsonElement
+→ Normalize via FieldMapping
+→ Process bulk EPCs
+
+GateWebController (Web — untuk admin):
+GET  /gate              → list semua gate config
+POST /gate/create       → tambah gate baru + generate API key
+PUT  /gate/{id}         → edit gate config + field mapping
+GET  /gate/{id}/log     → real-time log per gate (polling/SignalR)
+POST /gate/log/{id}/void → void 1 transaksi gate
+```
+
+### IGateService + GateService
+```
+- ValidateApiKey(apiKey) → return GateConfig
+- NormalizePayload(raw, fieldMapping) → return EpcList
+- ProcessGateStockOut(gateConfig, epcList) → StockOut record
+- GetGateLogs(gateId, date) → GateLog list
+- VoidGateLog(logId) → revert Tag.Status
+- GenerateApiKey() → UUID string
+```
+
+---
+
+## Web Dashboard Additions — Gate Monitor
+
+### Gate Config Page
+```
+List semua gate:
+- GateName, GateCode, Location, Status (Active/Inactive)
+- API Key (masked, bisa reveal + copy)
+- Tombol Edit, Delete, View Log
+
+Create/Edit Gate:
+- GateName input
+- LocationId dropdown
+- FieldMapping builder:
+  Visual table: [Field Reader] → [Field Kita]
+  Default fields: epc, timestamp
+  + Add Row button
+- Generate API Key button
+- Test Connection button (kirim dummy request)
+```
+
+### Gate Live Log Page
+```
+Real-time table (auto-refresh 5 detik):
+Columns: Time | EPC | Item Name | Status | Action
+- Status badge: PROCESSED (teal), UNKNOWN (warning), VOID (gray)
+- Action: Void button (kalau PROCESSED)
+- Filter: by date, by status
+- Export CSV button
+```
+
+---
+
+## Design Spec — Gate Pages (Web)
+
+```
+Gate Config page:
+→ Same table style as other pages
+→ API Key: monospace font, masked *****, 
+   reveal icon + copy icon
+→ FieldMapping builder: 2-column table
+   Left: input field reader name
+   Right: dropdown field kita (epc/timestamp/antenna)
+
+Gate Live Log page:
+→ Auto-refresh badge: "Live · 5s" (teal, top right)
+→ Table row color:
+   PROCESSED → normal
+   UNKNOWN   → warning_bg row
+   VOID      → gray, strikethrough text
+→ Void button: danger outline, confirm dialog
+```
+
+---
+
+## Prompt — Backend Gate Reader
+
+```
+Read CLAUDE.md, use SONNET.
+
+Add Gate Reader Stock Out feature to InvenScan backend.
+
+1. Add Entity classes:
+   - GateConfig: Id, GateName, GateCode, LocationId(FK),
+     ApiKey, FieldMapping(JSON string), IsActive, CreatedAt
+   - GateLog: Id, GateConfigId(FK), EpcTag, ItemName,
+     RawPayload, Status(PROCESSED/UNKNOWN/VOID), ScannedAt
+
+2. Add to AppDBContext + EF migration
+
+3. IGateService + GateService:
+   - ValidateApiKey(apiKey) → return GateConfig or null
+   - NormalizePayload(JsonElement raw, string fieldMapping) 
+     → return List<string> epcs
+   - ProcessGateStockOut(GateConfig gate, List<string> epcs)
+     → create StockOut record (CreatedBy = "GATE-{GateCode}")
+     → update Tag.Status = OUT per EPC
+     → create GateLog per EPC
+     → return { processed: int, unknown: int }
+   - GetGateLogs(gateId, DateTime? date) → List<GateLog>
+   - VoidGateLog(logId) → revert Tag.Status = IN_STOCK
+   - GenerateApiKey() → Guid.NewGuid().ToString()
+
+4. GateController (API):
+   POST /api/gate/stockout
+   → Auth: validate X-Gate-Api-Key header (NOT JWT)
+   → Accept JsonElement (flexible body)
+   → Call GateService.NormalizePayload + ProcessGateStockOut
+   → Return: { processed: N, unknown: M, gateCode: string }
+
+5. GateWebController + Views:
+   - Index.cshtml → list gate configs (DataTables)
+   - Create.cshtml → form buat gate baru + generate API key
+   - Edit.cshtml → edit gate + field mapping builder
+   - Log.cshtml → live log table (auto-refresh 5s via JS polling)
+   - Add "Gate Monitor" ke sidebar _Layout.cshtml
+
+6. Update StockOut flow:
+   - Gate-created StockOut: CreatedBy = "GATE-{GateCode}"
+   - Manual StockOut (Android): CreatedBy = userId
+   - Web dapat bedain keduanya dari CreatedBy prefix
+
+Follow DESIGN SYSTEM dari CLAUDE.md.
+Do not wait for confirmation, run sequentially.
+```
+
+---
+
+## Prompt — Android (No Change Needed)
+
+```
+Android Stock Out tidak perlu diubah untuk Gate feature.
+Gate Reader = hardware eksternal yang hit API langsung.
+Android HT tetap Mode 2 (manual scan).
+Pastikan StockOutActivity sudah implement sesuai prompt sebelumnya.
+```
+
+---
+
+## Summary — Complete Stock Out Feature
+
+```
+Mode 1: Gate Reader
+  RFID Reader → POST /api/gate/stockout (X-Gate-Api-Key)
+  → normalize via FieldMapping
+  → auto process → Tag = OUT
+  → Web live log real-time
+
+Mode 2: Android HT  
+  Operator scan → StockOutActivity
+  → offline queue → WorkManager sync
+  → POST /api/stockout (JWT)
+  → Tag = OUT
+```

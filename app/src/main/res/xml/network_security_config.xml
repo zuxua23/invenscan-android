@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  InvenScan connects to a buyer-configured server URL (set at login / in Settings).
+  Handheld terminals on a warehouse LAN frequently address an on-premise server
+  over plain HTTP, so cleartext is permitted by default to keep the product usable
+  out of the box.
+
+  PRODUCTION GUIDANCE: serve the backend over HTTPS (TLS 1.2+), set
+  cleartextTrafficPermitted to "false", and add a <pin-set> for certificate
+  pinning under <domain-config>. See docs/SCANNER_INTEGRATION.md and the README
+  security notes.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
