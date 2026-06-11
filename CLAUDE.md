@@ -1415,3 +1415,387 @@ packaging rapi sesuai standar CodeCanyon.
 5. MockScanner WAJIB berfungsi penuh untuk demo dan testing
    tanpa hardware apapun.
 ```
+
+---
+
+# DESIGN SYSTEM — InvenScan
+
+## Color Tokens
+
+### Primary Palette
+```xml
+<!-- Android colors.xml -->
+<color name="navy">#1A2332</color>
+<color name="teal_primary">#1D9E75</color>
+<color name="teal_light">#5DCAA5</color>
+<color name="teal_bg">#E1F5EE</color>
+<color name="surface">#F8FAFC</color>
+<color name="white">#FFFFFF</color>
+
+<!-- Status Colors -->
+<color name="danger">#E24B4A</color>
+<color name="danger_bg">#FCEBEB</color>
+<color name="warning">#EF9F27</color>
+<color name="warning_bg">#FAEEDA</color>
+<color name="success">#1D9E75</color>
+<color name="success_bg">#E1F5EE</color>
+
+<!-- Text -->
+<color name="text_primary">#1A2332</color>
+<color name="text_secondary">#5A6A7A</color>
+<color name="text_hint">#888888</color>
+
+<!-- Border -->
+<color name="border_default">#EEF2F5</color>
+<color name="border_light">#F0F0F0</color>
+```
+
+### CSS Variables (Web ASP.NET Razor)
+```css
+:root {
+  --navy: #1A2332;
+  --teal: #1D9E75;
+  --teal-light: #5DCAA5;
+  --teal-bg: #E1F5EE;
+  --surface: #F8FAFC;
+  --danger: #E24B4A;
+  --danger-bg: #FCEBEB;
+  --warning: #EF9F27;
+  --warning-bg: #FAEEDA;
+  --text-primary: #1A2332;
+  --text-secondary: #5A6A7A;
+  --text-hint: #888888;
+  --border: #EEF2F5;
+  --white: #FFFFFF;
+}
+```
+
+---
+
+## Typography
+
+### Android (styles.xml)
+```xml
+<!-- Heading -->
+<style name="TextHeading">
+    <item name="android:textSize">18sp</item>
+    <item name="android:textColor">@color/text_primary</item>
+    <item name="android:textStyle">bold</item>
+</style>
+
+<!-- Title -->
+<style name="TextTitle">
+    <item name="android:textSize">14sp</item>
+    <item name="android:textColor">@color/text_primary</item>
+    <item name="android:textStyle">bold</item>
+</style>
+
+<!-- Body -->
+<style name="TextBody">
+    <item name="android:textSize">13sp</item>
+    <item name="android:textColor">@color/text_primary</item>
+</style>
+
+<!-- Caption -->
+<style name="TextCaption">
+    <item name="android:textSize">11sp</item>
+    <item name="android:textColor">@color/text_hint</item>
+</style>
+```
+
+### Web (Bootstrap 5 override)
+```css
+h1, h2, h3 { color: var(--navy); font-weight: 500; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-hint { color: var(--text-hint); font-size: 12px; }
+body { font-size: 14px; color: var(--text-primary); }
+```
+
+---
+
+## Android UI Components
+
+### TopBar / Toolbar
+```xml
+<androidx.appcompat.widget.Toolbar
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/white"
+    android:elevation="2dp"
+    app:titleTextColor="@color/text_primary"
+    app:titleTextAppearance="@style/TextTitle"/>
+
+<!-- Bottom border -->
+<View
+    android:layout_width="match_parent"
+    android:layout_height="0.5dp"
+    android:background="@color/border_default"/>
+```
+
+### Card
+```xml
+<com.google.android.material.card.MaterialCardView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/border_default"
+    app:strokeWidth="0.5dp">
+```
+
+### Primary Button (Scan / Submit)
+```xml
+<com.google.android.material.button.MaterialButton
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:layout_margin="12dp"
+    android:textSize="14sp"
+    android:textStyle="bold"
+    app:backgroundTint="@color/teal_primary"
+    app:cornerRadius="10dp"/>
+```
+
+### Badge / Status Chip
+```xml
+<!-- Found / Success -->
+<TextView
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="3dp"
+    android:background="@drawable/bg_badge_teal"
+    android:textColor="@color/teal_primary"
+    android:textSize="11sp"
+    android:textStyle="bold"/>
+
+<!-- Missing / Danger -->
+<TextView
+    android:background="@drawable/bg_badge_danger"
+    android:textColor="@color/danger"/>
+
+<!-- Pending / Warning -->
+<TextView
+    android:background="@drawable/bg_badge_warning"
+    android:textColor="@color/warning"/>
+```
+
+### Scan Area (Dashed Border)
+```xml
+<LinearLayout
+    android:layout_margin="12dp"
+    android:padding="16dp"
+    android:background="@drawable/bg_scan_area"
+    android:gravity="center"
+    android:orientation="vertical">
+    <!-- bg_scan_area = rounded rect, dashed border teal, bg teal_bg -->
+</LinearLayout>
+```
+
+### Stat Card (Stock Taking Counter)
+```xml
+<LinearLayout
+    android:layout_weight="1"
+    android:background="@drawable/bg_card"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="10dp">
+    <TextView
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@color/teal_primary"/>
+    <TextView
+        android:textSize="11sp"
+        android:textColor="@color/text_hint"/>
+</LinearLayout>
+```
+
+### List Item (Scan Result)
+```xml
+<LinearLayout
+    android:padding="12dp"
+    android:background="@color/white"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <!-- Status dot -->
+    <View
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:background="@drawable/dot_teal"/>
+
+    <!-- Item info -->
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_marginStart="10dp"
+        android:orientation="vertical">
+        <TextView style="@style/TextTitle"/>
+        <TextView style="@style/TextCaption"/>
+    </LinearLayout>
+
+    <!-- Badge -->
+    <TextView ... />
+</LinearLayout>
+```
+
+### Sync Status Bar
+```xml
+<LinearLayout
+    android:layout_margin="12dp"
+    android:padding="10dp"
+    android:background="@drawable/bg_teal_light_rounded"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:gap="8dp">
+    <ImageView android:src="@drawable/ic_wifi"/>
+    <TextView
+        android:text="Synced · 2 min ago"
+        android:textSize="11sp"
+        android:textColor="@color/teal_primary"/>
+</LinearLayout>
+```
+
+---
+
+## Android Screen Specs
+
+### Home Screen
+```
+Background: surface (#F8FAFC)
+TopBar: white, navy title "InvenScan", settings icon kanan
+Welcome text: hint color name operator
+Menu grid: 2x2, card putih border tipis
+  - Tiap card: teal icon 24dp center + label 11sp bold
+Icons: ic_package, ic_clipboard_check, ic_list_check, ic_search
+Sync bar: teal_bg rounded, wifi icon + text
+```
+
+### Stock Taking Detail Screen
+```
+Background: surface
+TopBar: back arrow + "Stock taking"
+Stat row: 3 equal cards (Found=teal, Missing=danger, Unknown=warning)
+Scan area: dashed teal border, teal_bg fill, scan icon center
+List: putih bg, separator border_light
+  - Green dot = found, red dot = missing, amber dot = unknown
+  - Badge kanan: teal/danger/warning
+Submit button: teal full width, bottom fixed
+```
+
+### Stock In Screen
+```
+Background: surface
+TopBar: back arrow + "Stock in"
+Location spinner: card style, chevron icon
+Toggle RFID/Barcode: teal accent
+Start/Stop button: teal full width
+RecyclerView: list item style di atas
+Submit FAB atau bottom button: teal
+```
+
+### Search Item Screen
+```
+Background: surface
+TopBar: back arrow + "Search item"
+Scan area: center screen, large
+Result card: item detail (nama, kode, lokasi, qty, status)
+History list: bawah result card
+```
+
+### Settings Screen
+```
+Background: surface
+Grouped list style
+  Group 1: Server URL input, Device ID input
+  Group 2: Scanner type info (label only)
+  Group 3: App version
+Save button: teal full width bottom
+```
+
+---
+
+## Web Dashboard Specs (Bootstrap 5 + DataTables)
+
+### Layout Structure
+```
+Navbar (navy bg #1A2332)
+  - Brand: teal dot + "InvenScan" white
+  - Nav items: muted color, active = teal
+
+Sidebar (surface bg #F8FAFC)
+  - Border right 0.5px border_default
+  - Item: icon 15px + label 13px, text_secondary
+  - Active: teal_bg bg + teal text + left border 2px teal + bold
+
+Content Area
+  - Padding 20px
+  - Title 14px bold navy
+```
+
+### KPI Cards
+```
+Background: surface (#F8FAFC)
+Border: 0.5px border_default
+Border radius: 8px
+Padding: 12px
+Value: 20px bold (teal = normal, warning = pending, danger = error)
+Label: 11px text_hint
+Grid: 4 columns desktop, 2 columns mobile
+```
+
+### Tables (DataTables)
+```
+Header: text_hint 12px, border-bottom border_default
+Row: 13px text_primary, border-bottom border_light
+Hover: surface bg
+Badge in table: same spec as Android badge
+```
+
+### Forms
+```
+Input: border 0.5px border_default, radius 8px, 36px height
+Focus: border teal_primary
+Label: 12px text_secondary, margin-bottom 4px
+Submit button: teal bg, white text, radius 8px
+```
+
+### Status Badges (Web)
+```css
+.badge-teal    { background: #E1F5EE; color: #0F6E56; }
+.badge-danger  { background: #FCEBEB; color: #A32D2D; }
+.badge-warning { background: #FAEEDA; color: #854F0B; }
+.badge-gray    { background: #F1EFE8; color: #5F5E5A; }
+/* padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500 */
+```
+
+---
+
+## Drawables Reference (Android)
+
+```
+bg_card              → white, stroke 0.5dp border_default, radius 12dp
+bg_badge_teal        → teal_bg fill, radius 20dp
+bg_badge_danger      → danger_bg fill, radius 20dp
+bg_badge_warning     → warning_bg fill, radius 20dp
+bg_scan_area         → teal_bg fill, dashed stroke teal_light 1.5dp, radius 10dp
+bg_teal_light_rounded → teal_bg fill, radius 8dp
+dot_teal             → circle teal_primary 8dp
+dot_danger           → circle danger 8dp
+dot_warning          → circle warning 8dp
+```
+
+---
+
+## Design Rules (WAJIB diikuti)
+
+```
+1. JANGAN pakai elevation/shadow — gunakan border tipis 0.5dp
+2. Tombol aksi utama SELALU teal_primary
+3. Status SELALU pakai 3 warna: teal=ok, warning=pending, danger=error
+4. Background screen SELALU surface (#F8FAFC), bukan pure white
+5. TopBar/Toolbar SELALU white dengan bottom border tipis
+6. Font size minimum 11sp Android / 11px web
+7. Scan area SELALU pakai dashed border style
+8. List item SELALU ada status dot di kiri
+9. Card SELALU 0dp elevation, border 0.5dp
+10. Sidebar web active state: teal_bg + left border 2dp teal
+```
