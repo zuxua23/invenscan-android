@@ -1799,3 +1799,456 @@ dot_warning          → circle warning 8dp
 9. Card SELALU 0dp elevation, border 0.5dp
 10. Sidebar web active state: teal_bg + left border 2dp teal
 ```
+
+---
+
+# STOCK OUT FEATURE — Missing Feature Patch
+
+## Database Addition
+
+```sql
+-- tb_StockOut
+tb_StockOut: Id, DocNumber, LocationId(FK), Notes,
+             CreatedBy, CreatedAt, Status (PENDING/SYNCED)
+
+-- tb_StockOutDetail
+tb_StockOutDetail: Id, StockOutId(FK), TagId(FK),
+                   ItemId(FK), ScannedCode,
+                   ScanType (RFID/BARCODE), CreatedAt
+```
+
+## Backend Additions
+
+```
+StockOutController (API):
+GET  /api/stockout?code={code}&scannerType={type}
+POST /api/stockout
+POST /api/stockout/bulk-info
+
+StockOutWebController (Web):
+GET  /stockout       → list history (DataTables)
+GET  /stockout/{id}  → detail dokumen + item list
+
+Service:
+IStockOutService + StockOutService
+- GetByCode(code, scannerType) → lookup tag → return item info
+- Submit(dto) → save StockOut + StockOutDetail + update Tag status = OUT
+- BulkInfo(codes[]) → lookup multiple tags sekaligus
+```
+
+## Android Additions
+
+```
+StockOutScanEntity  → Room entity untuk offline queue
+StockOutRepository  → local + remote
+StockOutViewModel
+StockOutActivity    → same pattern as StockInActivity
+layout_activity_stock_out.xml
+
+HomeActivity update:
+→ Grid jadi 2x3 (tambah Stock Out)
+→ Icon: ti-package-export
+
+SyncWorker update:
+→ Add sync block for StockOutScanEntity
+```
+
+## Stock Out Screen Spec (Android)
+
+```
+Same pattern as Stock In:
+- Background: surface #F8FAFC
+- TopBar: white + bottom border
+- Location spinner: card style
+- Toggle RFID/Barcode
+- Start/Stop scan button: teal
+- RecyclerView: list item ter-scan
+  dot merah (OUT) + item name + badge "OUT"
+- Submit button: teal full width bottom
+- Offline queue + WorkManager sync
+```
+
+## Prompt — Backend Stock Out
+
+```
+Read CLAUDE.md, use SONNET.
+
+Add Stock Out feature to InvenScan backend.
+
+1. Add Entity classes:
+   - StockOut: Id, DocNumber, LocationId(FK), Notes,
+     CreatedBy, CreatedAt, Status(PENDING/SYNCED)
+   - StockOutDetail: Id, StockOutId(FK), TagId(FK),
+     ItemId(FK), ScannedCode, ScanType, CreatedAt
+
+2. Add to AppDBContext + create EF migration
+
+3. IStockOutService interface + StockOutService implementation:
+   - GetByCode(code, scannerType) → lookup tag → return item info
+   - Submit(StockOutDto) → save header + details + 
+     update Tag.Status = OUT
+   - BulkInfo(string[] codes) → lookup multiple tags
+
+4. StockOutController (API):
+   GET  /api/stockout?code={code}&scannerType={type}
+   POST /api/stockout
+   POST /api/stockout/bulk-info
+   → Same pattern as StockInController
+
+5. StockOutWebController + Views:
+   - Index.cshtml → DataTables list semua stock out history
+   - Detail.cshtml → detail dokumen + item list
+   - Tambah "Stock Out" di sidebar _Layout.cshtml
+     dengan icon ti-package-export
+
+Follow DESIGN SYSTEM dari CLAUDE.md.
+Do not wait for confirmation, run sequentially.
+```
+
+## Prompt — Android Stock Out
+
+```
+Read CLAUDE.md, use SONNET.
+
+Add Stock Out feature to InvenScan Android.
+
+1. Add Room Entity:
+   StockOutScanEntity (same pattern as StockInScanEntity):
+   id, docNumber, locationId, tagId, itemId,
+   scannedCode, scanType, syncStatus, createdAt
+
+2. Add AppDao queries for StockOutScanEntity:
+   - insertStockOutScan()
+   - getPendingStockOutScans()
+   - updateStockOutSyncStatus()
+   - deleteStockOutScan()
+
+3. Add ApiService endpoints:
+   GET  /api/stockout
+   POST /api/stockout
+   POST /api/stockout/bulk-info
+
+4. StockOutRepository:
+   - scanItem(code, scannerType) → remote + local cache
+   - submitStockOut(dto) → remote, fallback to local queue
+   - getPendingSync() → local queue
+
+5. StockOutViewModel:
+   - locationList: StateFlow<List<Location>>
+   - scanResult: StateFlow<Resource<ItemInfo>>
+   - scannedItems: StateFlow<List<StockOutScanEntity>>
+   - submitResult: StateFlow<Resource<Boolean>>
+
+6. StockOutActivity + layout_activity_stock_out.xml:
+   - Spinner: pilih lokasi (fetch /api/location)
+   - Toggle switch: RFID / Barcode mode
+   - Start/Stop scan button (teal)
+   - RecyclerView: list item ter-scan
+     dot merah + item name + kode + badge "OUT"
+   - Submit button: teal full width fixed bottom
+   - Loading, empty, error state wajib ada
+   - Offline queue ke StockOutScanEntity kalau gagal
+
+7. Update HomeActivity:
+   - Grid layout jadi 2 kolom x 3 baris
+   - Tambah menu Stock Out
+   - Icon: package-export atau arrow-up
+   - Urutan: Stock In, Stock Out, Stock Taking,
+     Stock Prep, Search Item, Settings
+
+8. Update SyncWorker:
+   - Add sync block untuk StockOutScanEntity
+   - Same retry pattern as StockInScanEntity
+
+Follow DESIGN SYSTEM dari CLAUDE.md.
+Do not wait for confirmation, run sequentially.
+```
+
+---
+
+# STOCK OUT — GATE READER FEATURE
+
+## Overview
+
+Stock Out punya 2 mode:
+```
+Mode 1: Gate Reader (Web)
+→ RFID reader fixed di gate kirim data ke server via API
+→ Abstract endpoint — buyer define format sesuai reader mereka
+→ Web dashboard tampil real-time log
+→ Admin bisa review / void
+
+Mode 2: Android HT
+→ Operator scan manual pakai HT
+→ Offline-first + WorkManager sync
+→ Same pattern as Stock In
+```
+
+---
+
+## Gate Reader — Abstract Endpoint Design
+
+### Konsep
+```
+Buyer punya reader brand apapun (Impinj, Zebra FX, Zebra FR, dll)
+→ Mereka configure reader untuk hit endpoint kita
+→ Kita terima data, normalize, proses
+
+Endpoint fleksibel:
+→ Terima format apapun (JSON flat, JSON nested, XML)
+→ Field mapping di-configure via web dashboard
+→ Buyer tinggal map field reader mereka ke field kita
+```
+
+### Gate Config Table (Database)
+```sql
+tb_GateConfig: 
+  Id, GateName, GateCode, LocationId(FK),
+  ApiKey (untuk auth reader),
+  FieldMapping (JSON string — map field reader ke field kita),
+  IsActive, CreatedAt
+
+-- Contoh FieldMapping:
+-- { "epc": "EPC", "antenna": "AntennaPort", "timestamp": "ReadTime" }
+-- Buyer isi ini di web dashboard sesuai format reader mereka
+```
+
+### Gate Reader Endpoint
+```
+POST /api/gate/stockout
+Headers: X-Gate-Api-Key: {apiKey}
+
+Body: flexible — terima apapun yang reader kirim
+Contoh format A (Impinj Octane):
+{
+  "EPC": "E2003412B12",
+  "AntennaPort": 1,
+  "ReadTime": "2026-06-11T09:41:00Z"
+}
+
+Contoh format B (Zebra FX):
+{
+  "tag_id": "E2003412B12",
+  "reader_name": "gate-01",
+  "timestamp": 1718094060
+}
+
+Server normalize via FieldMapping dari GateConfig
+→ extract EPC → process stock out
+```
+
+### Processing Flow
+```
+Reader hit /api/gate/stockout
+    ↓
+Validate X-Gate-Api-Key → cari GateConfig
+    ↓
+Parse body → normalize via FieldMapping
+    ↓
+Extract EPC list
+    ↓
+Lookup Tag di database
+    ↓
+Create StockOut record (auto, CreatedBy = "GATE-{GateCode}")
+    ↓
+Update Tag.Status = OUT
+    ↓
+Push ke real-time log (SignalR atau polling)
+    ↓
+Return: { processed: N, unknown: M }
+```
+
+---
+
+## Backend Additions — Gate Reader
+
+### New Entity
+```csharp
+// GateConfig.cs
+public class GateConfig {
+    public int Id { get; set; }
+    public string GateName { get; set; }
+    public string GateCode { get; set; }
+    public int LocationId { get; set; }
+    public string ApiKey { get; set; }        // generated UUID
+    public string FieldMapping { get; set; }  // JSON string
+    public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public Location Location { get; set; }
+}
+
+// GateLog.cs (real-time log)
+public class GateLog {
+    public int Id { get; set; }
+    public int GateConfigId { get; set; }
+    public string EpcTag { get; set; }
+    public string ItemName { get; set; }
+    public string RawPayload { get; set; }    // simpan raw request
+    public string Status { get; set; }        // PROCESSED/UNKNOWN/VOID
+    public DateTime ScannedAt { get; set; }
+    public GateConfig GateConfig { get; set; }
+}
+```
+
+### New Controllers
+```
+GateController (API — untuk reader):
+POST /api/gate/stockout
+→ Auth via X-Gate-Api-Key header (bukan JWT)
+→ Accept [FromBody] dynamic / JsonElement
+→ Normalize via FieldMapping
+→ Process bulk EPCs
+
+GateWebController (Web — untuk admin):
+GET  /gate              → list semua gate config
+POST /gate/create       → tambah gate baru + generate API key
+PUT  /gate/{id}         → edit gate config + field mapping
+GET  /gate/{id}/log     → real-time log per gate (polling/SignalR)
+POST /gate/log/{id}/void → void 1 transaksi gate
+```
+
+### IGateService + GateService
+```
+- ValidateApiKey(apiKey) → return GateConfig
+- NormalizePayload(raw, fieldMapping) → return EpcList
+- ProcessGateStockOut(gateConfig, epcList) → StockOut record
+- GetGateLogs(gateId, date) → GateLog list
+- VoidGateLog(logId) → revert Tag.Status
+- GenerateApiKey() → UUID string
+```
+
+---
+
+## Web Dashboard Additions — Gate Monitor
+
+### Gate Config Page
+```
+List semua gate:
+- GateName, GateCode, Location, Status (Active/Inactive)
+- API Key (masked, bisa reveal + copy)
+- Tombol Edit, Delete, View Log
+
+Create/Edit Gate:
+- GateName input
+- LocationId dropdown
+- FieldMapping builder:
+  Visual table: [Field Reader] → [Field Kita]
+  Default fields: epc, timestamp
+  + Add Row button
+- Generate API Key button
+- Test Connection button (kirim dummy request)
+```
+
+### Gate Live Log Page
+```
+Real-time table (auto-refresh 5 detik):
+Columns: Time | EPC | Item Name | Status | Action
+- Status badge: PROCESSED (teal), UNKNOWN (warning), VOID (gray)
+- Action: Void button (kalau PROCESSED)
+- Filter: by date, by status
+- Export CSV button
+```
+
+---
+
+## Design Spec — Gate Pages (Web)
+
+```
+Gate Config page:
+→ Same table style as other pages
+→ API Key: monospace font, masked *****, 
+   reveal icon + copy icon
+→ FieldMapping builder: 2-column table
+   Left: input field reader name
+   Right: dropdown field kita (epc/timestamp/antenna)
+
+Gate Live Log page:
+→ Auto-refresh badge: "Live · 5s" (teal, top right)
+→ Table row color:
+   PROCESSED → normal
+   UNKNOWN   → warning_bg row
+   VOID      → gray, strikethrough text
+→ Void button: danger outline, confirm dialog
+```
+
+---
+
+## Prompt — Backend Gate Reader
+
+```
+Read CLAUDE.md, use SONNET.
+
+Add Gate Reader Stock Out feature to InvenScan backend.
+
+1. Add Entity classes:
+   - GateConfig: Id, GateName, GateCode, LocationId(FK),
+     ApiKey, FieldMapping(JSON string), IsActive, CreatedAt
+   - GateLog: Id, GateConfigId(FK), EpcTag, ItemName,
+     RawPayload, Status(PROCESSED/UNKNOWN/VOID), ScannedAt
+
+2. Add to AppDBContext + EF migration
+
+3. IGateService + GateService:
+   - ValidateApiKey(apiKey) → return GateConfig or null
+   - NormalizePayload(JsonElement raw, string fieldMapping) 
+     → return List<string> epcs
+   - ProcessGateStockOut(GateConfig gate, List<string> epcs)
+     → create StockOut record (CreatedBy = "GATE-{GateCode}")
+     → update Tag.Status = OUT per EPC
+     → create GateLog per EPC
+     → return { processed: int, unknown: int }
+   - GetGateLogs(gateId, DateTime? date) → List<GateLog>
+   - VoidGateLog(logId) → revert Tag.Status = IN_STOCK
+   - GenerateApiKey() → Guid.NewGuid().ToString()
+
+4. GateController (API):
+   POST /api/gate/stockout
+   → Auth: validate X-Gate-Api-Key header (NOT JWT)
+   → Accept JsonElement (flexible body)
+   → Call GateService.NormalizePayload + ProcessGateStockOut
+   → Return: { processed: N, unknown: M, gateCode: string }
+
+5. GateWebController + Views:
+   - Index.cshtml → list gate configs (DataTables)
+   - Create.cshtml → form buat gate baru + generate API key
+   - Edit.cshtml → edit gate + field mapping builder
+   - Log.cshtml → live log table (auto-refresh 5s via JS polling)
+   - Add "Gate Monitor" ke sidebar _Layout.cshtml
+
+6. Update StockOut flow:
+   - Gate-created StockOut: CreatedBy = "GATE-{GateCode}"
+   - Manual StockOut (Android): CreatedBy = userId
+   - Web dapat bedain keduanya dari CreatedBy prefix
+
+Follow DESIGN SYSTEM dari CLAUDE.md.
+Do not wait for confirmation, run sequentially.
+```
+
+---
+
+## Prompt — Android (No Change Needed)
+
+```
+Android Stock Out tidak perlu diubah untuk Gate feature.
+Gate Reader = hardware eksternal yang hit API langsung.
+Android HT tetap Mode 2 (manual scan).
+Pastikan StockOutActivity sudah implement sesuai prompt sebelumnya.
+```
+
+---
+
+## Summary — Complete Stock Out Feature
+
+```
+Mode 1: Gate Reader
+  RFID Reader → POST /api/gate/stockout (X-Gate-Api-Key)
+  → normalize via FieldMapping
+  → auto process → Tag = OUT
+  → Web live log real-time
+
+Mode 2: Android HT  
+  Operator scan → StockOutActivity
+  → offline queue → WorkManager sync
+  → POST /api/stockout (JWT)
+  → Tag = OUT
+```
