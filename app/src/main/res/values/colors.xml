@@ -1,46 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#1565C0</color>
-    <color name="colorPrimaryDark">#003c8f</color>
-    <color name="colorPrimaryVariant">#003c8f</color>
-    <color name="colorOnPrimary">#FFFFFF</color>
-    <color name="colorSecondary">#FF6F00</color>
-    <color name="colorOnSecondary">#FFFFFF</color>
-    <color name="colorBackground">#FAFAFA</color>
-    <color name="colorSurface">#FFFFFF</color>
-    <color name="colorOnSurface">#212121</color>
-    <color name="colorTextPrimary">#212121</color>
-    <color name="colorTextSecondary">#616161</color>
-    <color name="colorTextHint">#9E9E9E</color>
-    <color name="colorDivider">#E0E0E0</color>
-
-    <!-- Scan result states -->
-    <color name="colorFound">#2E7D32</color>
-    <color name="colorFoundBg">#E8F5E9</color>
-    <color name="colorMissing">#C62828</color>
-    <color name="colorMissingBg">#FFEBEE</color>
-    <color name="colorUnknown">#E65100</color>
-    <color name="colorUnknownBg">#FFF3E0</color>
-
-    <!-- Status badge colors -->
-    <color name="colorStatusOpen">#1565C0</color>
-    <color name="colorStatusOpenBg">#E3F2FD</color>
-    <color name="colorStatusInProgress">#E65100</color>
-    <color name="colorStatusInProgressBg">#FFF3E0</color>
-    <color name="colorStatusDone">#2E7D32</color>
-    <color name="colorStatusDoneBg">#E8F5E9</color>
-    <color name="colorStatusClosed">#616161</color>
-    <color name="colorStatusClosedBg">#F5F5F5</color>
-
-    <!-- Menu tile colors -->
-    <color name="colorTileStockIn">#1565C0</color>
-    <color name="colorTileStockTaking">#6A1B9A</color>
-    <color name="colorTileStockPrep">#00695C</color>
-    <color name="colorTileSearch">#E65100</color>
-
+    <!-- InvenScan Design System — Primary Palette -->
+    <color name="navy">#1A2332</color>
+    <color name="teal_primary">#1D9E75</color>
+    <color name="teal_light">#5DCAA5</color>
+    <color name="teal_bg">#E1F5EE</color>
+    <color name="surface">#F8FAFC</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="error">#B00020</color>
+
+    <!-- Status Colors -->
+    <color name="danger">#E24B4A</color>
+    <color name="danger_bg">#FCEBEB</color>
+    <color name="warning">#EF9F27</color>
+    <color name="warning_bg">#FAEEDA</color>
+    <color name="success">#1D9E75</color>
+    <color name="success_bg">#E1F5EE</color>
+
+    <!-- Text -->
+    <color name="text_primary">#1A2332</color>
+    <color name="text_secondary">#5A6A7A</color>
+    <color name="text_hint">#888888</color>
+
+    <!-- Border -->
+    <color name="border_default">#EEF2F5</color>
+    <color name="border_light">#F0F0F0</color>
+
+    <!-- Legacy aliases — kept for backward compatibility -->
+    <color name="colorPrimary">#1D9E75</color>
+    <color name="colorPrimaryDark">#1A2332</color>
+    <color name="colorPrimaryVariant">#1A2332</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorSecondary">#EF9F27</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
+    <color name="colorBackground">#F8FAFC</color>
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorOnSurface">#1A2332</color>
+    <color name="colorTextPrimary">#1A2332</color>
+    <color name="colorTextSecondary">#5A6A7A</color>
+    <color name="colorTextHint">#888888</color>
+    <color name="colorDivider">#EEF2F5</color>
+    <color name="error">#E24B4A</color>
+
+    <!-- Scan result state aliases -->
+    <color name="colorFound">#1D9E75</color>
+    <color name="colorFoundBg">#E1F5EE</color>
+    <color name="colorMissing">#E24B4A</color>
+    <color name="colorMissingBg">#FCEBEB</color>
+    <color name="colorUnknown">#EF9F27</color>
+    <color name="colorUnknownBg">#FAEEDA</color>
+
+    <!-- Status badge color aliases -->
+    <color name="colorStatusOpen">#1D9E75</color>
+    <color name="colorStatusOpenBg">#E1F5EE</color>
+    <color name="colorStatusInProgress">#EF9F27</color>
+    <color name="colorStatusInProgressBg">#FAEEDA</color>
+    <color name="colorStatusDone">#1D9E75</color>
+    <color name="colorStatusDoneBg">#E1F5EE</color>
+    <color name="colorStatusClosed">#5A6A7A</color>
+    <color name="colorStatusClosedBg">#EEF2F5</color>
 
     <!-- Legacy -->
     <color name="purple_200">#FFBB86FC</color>
