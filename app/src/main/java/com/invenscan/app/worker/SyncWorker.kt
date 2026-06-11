@@ -15,6 +15,8 @@ import com.invenscan.app.data.local.entity.SyncStatus
 import com.invenscan.app.data.model.StockInBulkInfoRequest
 import com.invenscan.app.data.model.StockInDetailRequest
 import com.invenscan.app.data.model.StockInSubmitRequest
+import com.invenscan.app.data.model.StockOutDetailRequest
+import com.invenscan.app.data.model.StockOutSubmitRequest
 import com.invenscan.app.data.model.StockPrepPickedItem
 import com.invenscan.app.data.model.StockPrepSubmitRequest
 import com.invenscan.app.data.remote.ApiService
@@ -33,6 +35,7 @@ class SyncWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         return try {
             syncStockInScans()
+            syncStockOutScans()
             syncPendingSubmits()
             Result.success()
         } catch (e: Exception) {
@@ -84,6 +87,39 @@ class SyncWorker @AssistedInject constructor(
         }
 
         appDao.deleteStockInScanByStatus(SyncStatus.SYNCED)
+    }
+
+    private suspend fun syncStockOutScans() {
+        val pendingScans = appDao.getPendingStockOutScans()
+        if (pendingScans.isEmpty()) return
+
+        val grouped = pendingScans.groupBy { it.docNumber }
+        grouped.forEach { (_, scans) ->
+            val locationId = scans.first().locationId
+            val details = scans.map { scan ->
+                StockOutDetailRequest(
+                    scannedCode = scan.scannedCode,
+                    scanType = scan.scanType,
+                    itemId = scan.itemId
+                )
+            }
+
+            val response = apiService.submitStockOut(
+                StockOutSubmitRequest(
+                    locationId = locationId,
+                    notes = null,
+                    details = details
+                )
+            )
+
+            if (response.isSuccessful && response.body()?.success == true) {
+                scans.forEach { scan -> appDao.deleteStockOutScan(scan.id) }
+            } else {
+                scans.forEach { scan ->
+                    appDao.updateStockOutSyncStatus(scan.id, SyncStatus.FAILED)
+                }
+            }
+        }
     }
 
     private suspend fun syncPendingSubmits() {
