@@ -3,7 +3,7 @@ package com.invenscan.app.di
 import com.invenscan.app.data.remote.ApiClient
 import com.invenscan.app.data.remote.ApiService
 import com.invenscan.app.data.remote.AuthInterceptor
-import com.invenscan.app.util.PrefManager
+import com.invenscan.app.data.remote.DynamicBaseUrlInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,8 +17,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(prefManager: PrefManager, authInterceptor: AuthInterceptor): Retrofit {
-        return ApiClient.buildRetrofit(prefManager, authInterceptor)
+    fun provideRetrofit(authInterceptor: AuthInterceptor, dynamicBaseUrlInterceptor: DynamicBaseUrlInterceptor): Retrofit {
+        return ApiClient.buildRetrofit(authInterceptor, dynamicBaseUrlInterceptor)
     }
 
     @Provides
