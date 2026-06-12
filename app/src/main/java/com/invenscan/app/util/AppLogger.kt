@@ -27,11 +27,13 @@ class AppLogger @Inject constructor(
 
         scope.launch {
             runCatching {
-                database.appDao().insertAppLog(
+                database.appDao().insertLog(
                     AppLogEntity(
                         level = "INFO",
                         tag = module,
-                        message = "[$action] $description | user=$userId",
+                        message = "[$action] $description",
+                        userId = userId,
+                        deviceId = prefManager.deviceId,
                         timestamp = System.currentTimeMillis()
                     )
                 )

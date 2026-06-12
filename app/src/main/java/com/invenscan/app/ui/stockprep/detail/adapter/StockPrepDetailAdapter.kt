@@ -28,7 +28,7 @@ class StockPrepDetailAdapter : ListAdapter<PickItem, StockPrepDetailAdapter.View
 
             val isFulfilled = item.pickedQty >= item.detail.requestedQty
             val cardColor = if (isFulfilled) R.color.colorFoundBg else R.color.colorSurface
-            binding.root.setCardBackgroundColor(
+            binding.root.setBackgroundColor(
                 ContextCompat.getColor(binding.root.context, cardColor)
             )
         }
