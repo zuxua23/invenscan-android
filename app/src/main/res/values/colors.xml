@@ -60,6 +60,9 @@
     <color name="colorStatusClosed">#5A6A7A</color>
     <color name="colorStatusClosedBg">#EEF2F5</color>
 
+    <!-- Launcher icon -->
+    <color name="ic_launcher_background">#1A2332</color>
+
     <!-- Legacy -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
