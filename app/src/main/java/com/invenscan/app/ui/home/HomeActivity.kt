@@ -15,6 +15,7 @@ import com.invenscan.app.ui.stockin.StockInActivity
 import com.invenscan.app.ui.stockout.StockOutActivity
 import com.invenscan.app.ui.stockprep.StockPrepActivity
 import com.invenscan.app.ui.stocktaking.StockTakingActivity
+import com.invenscan.app.ui.tagreg.TagRegistrationActivity
 import com.invenscan.app.util.CustomDialog
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -50,13 +51,16 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>() {
         binding.cardRfidSettings.setOnClickListener {
             startActivity(Intent(this, RfidSettingsActivity::class.java))
         }
+        binding.cardTagRegistration.setOnClickListener {
+            startActivity(Intent(this, TagRegistrationActivity::class.java))
+        }
     }
 
     override fun observeViewModel() {}
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_home, menu)
-        return true
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -73,6 +77,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>() {
                     positiveText = getString(R.string.action_logout),
                     negativeText = getString(R.string.dialog_cancel),
                     onPositive = {
+                        appLogger.logLogout(prefManager.userId ?: "")
                         viewModel.logout()
                         startActivity(Intent(this, LoginActivity::class.java).apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

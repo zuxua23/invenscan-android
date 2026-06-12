@@ -276,7 +276,7 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <!-- Row 4: RFID Settings (full width) -->
+            <!-- Row 4: RFID Settings | Tag Registration -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -286,7 +286,7 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardRfidSettings"
                     android:layout_width="0dp"
-                    android:layout_height="80dp"
+                    android:layout_height="110dp"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     app:cardBackgroundColor="@color/white"
@@ -298,33 +298,62 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="16dp">
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
 
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
                             android:src="@drawable/ic_rfid"
                             app:tint="@color/teal_primary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
+                            android:layout_marginTop="8dp"
                             android:text="@string/menu_rfid_settings"
                             android:textColor="@color/text_primary"
-                            android:textSize="13sp"
+                            android:textSize="11sp"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- placeholder for alignment -->
-                <View
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardTagRegistration"
                     android:layout_width="0dp"
-                    android:layout_height="0dp"
+                    android:layout_height="110dp"
                     android:layout_marginStart="8dp"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/border_default"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_plug"
+                            app:tint="@color/teal_primary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/menu_tag_registration"
+                            android:textColor="@color/text_primary"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
             <!-- Sync status bar -->

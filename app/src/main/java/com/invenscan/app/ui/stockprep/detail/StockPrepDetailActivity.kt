@@ -118,6 +118,8 @@ class StockPrepDetailActivity : BaseActivity<ActivityStockPrepDetailBinding>(),
                             is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
                             is Resource.Success -> {
                                 binding.progressBar.visibility = View.GONE
+                                val docNumber = intent.getStringExtra(EXTRA_DOC_NUMBER) ?: ""
+                                appLogger.logStockPrepSubmit(docNumber)
                                 showMessage(getString(R.string.success_submit_offline))
                                 WorkManagerUtil.triggerImmediateSync(this@StockPrepDetailActivity)
                                 viewModel.resetSubmitState()
@@ -151,7 +153,7 @@ class StockPrepDetailActivity : BaseActivity<ActivityStockPrepDetailBinding>(),
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_scan, menu)
-        return true
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

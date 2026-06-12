@@ -123,7 +123,7 @@ class SearchItemActivity : BaseActivity<ActivitySearchItemBinding>(), ScannerCon
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_scan, menu)
-        return true
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

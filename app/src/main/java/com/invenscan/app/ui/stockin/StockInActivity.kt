@@ -164,6 +164,7 @@ class StockInActivity : BaseActivity<ActivityStockInBinding>(), ScannerContract.
             is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
             is Resource.Success -> {
                 binding.progressBar.visibility = View.GONE
+                appLogger.logStockInSubmit(viewModel.scannedItems.value.size)
                 showMessage(getString(R.string.success_submit_offline))
                 WorkManagerUtil.triggerImmediateSync(this)
                 viewModel.resetSubmitState()
@@ -233,7 +234,7 @@ class StockInActivity : BaseActivity<ActivityStockInBinding>(), ScannerContract.
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_scan, menu)
-        return true
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

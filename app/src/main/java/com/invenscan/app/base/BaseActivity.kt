@@ -1,13 +1,18 @@
 package com.invenscan.app.base
 
 import android.os.Bundle
+import android.view.Menu
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewbinding.ViewBinding
+import com.invenscan.app.R
+import com.invenscan.app.scanner.BatteryProvider
+import com.invenscan.app.util.AppLogger
 import com.invenscan.app.util.CustomDialog
 import com.invenscan.app.util.CustomToast
 import com.invenscan.app.util.PrefManager
@@ -22,6 +27,12 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
 
     @Inject
     lateinit var prefManager: PrefManager
+
+    @Inject
+    lateinit var batteryProvider: BatteryProvider
+
+    @Inject
+    lateinit var appLogger: AppLogger
 
     abstract fun inflateBinding(): VB
     abstract fun initView()
@@ -56,6 +67,21 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
             if (isDark) AppCompatDelegate.MODE_NIGHT_YES
             else AppCompatDelegate.MODE_NIGHT_NO
         )
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_battery, menu)
+        val actionView = menu.findItem(R.id.action_battery)?.actionView
+        if (actionView != null) {
+            val tvHt = actionView.findViewById<TextView>(R.id.tvBatteryHt)
+            val tvRfid = actionView.findViewById<TextView>(R.id.tvBatteryRfid)
+            tvHt?.text = getString(R.string.label_battery_ht) + ": ${batteryProvider.getHtBattery()}%"
+            if (prefManager.batteryDisplayMode == PrefManager.BATTERY_MODE_DUAL) {
+                tvRfid?.visibility = View.VISIBLE
+                tvRfid?.text = "  " + getString(R.string.label_battery_rfid) + ": ${batteryProvider.getRfidBattery() ?: 0}%"
+            }
+        }
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onDestroy() {

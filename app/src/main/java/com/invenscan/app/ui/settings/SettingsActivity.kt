@@ -53,6 +53,7 @@ class SettingsActivity : BaseActivity<ActivitySettingsBinding>() {
             val deviceId = binding.etDeviceId.text.toString().trim()
                 .ifBlank { viewModel.prefManager.deviceId }
             viewModel.save(serverUrl, deviceId)
+            appLogger.logSettingsChange("server_url, device_id")
             CustomToast.show(this, getString(R.string.success_settings_saved), CustomToast.Type.SUCCESS)
         }
 

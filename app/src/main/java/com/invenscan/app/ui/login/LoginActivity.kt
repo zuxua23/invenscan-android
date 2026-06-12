@@ -61,6 +61,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
                             is Resource.Loading -> showLoading(true)
                             is Resource.Success -> {
                                 showLoading(false)
+                                appLogger.logLogin(prefManager.userId ?: "")
                                 navigateToHome()
                             }
                             is Resource.Error -> {

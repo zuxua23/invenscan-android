@@ -35,7 +35,7 @@
     <string name="label_scan_mode">Scan Mode</string>
     <string name="label_rfid">RFID</string>
     <string name="label_barcode">Barcode</string>
-    <string name="action_start_scan">Start Scan</string>
+    <string name="action_start_scan">Resume</string>
     <string name="action_stop_scan">Stop</string>
     <string name="action_submit">Submit</string>
     <string name="action_simulate_scan">Simulate Scan</string>
@@ -143,6 +143,21 @@
     <!-- Battery -->
     <string name="label_battery_ht">HT</string>
     <string name="label_battery_rfid">RFID</string>
+
+    <!-- Tag Registration -->
+    <string name="menu_tag_registration">Tag Registration</string>
+    <string name="title_tag_registration">Tag Registration</string>
+    <string name="hint_scan_tag_for_registration">Scan a tag to look up or re-register</string>
+    <string name="label_tag_id">Tag ID</string>
+    <string name="label_tag_epc">EPC Tag</string>
+    <string name="label_tag_item">Item</string>
+    <string name="label_tag_status">Tag Status</string>
+    <string name="dialog_reregister_title">Re-register Tag?</string>
+    <string name="dialog_reregister_message">Tag was previously used for \"%1$s\". Reset and re-register?</string>
+    <string name="success_tag_reregistered">Tag reset. Ready for new item registration.</string>
+    <string name="action_reregister">Re-register</string>
+    <string name="info_tag_already_available">Tag is already available for registration.</string>
+    <string name="error_tag_not_found">Tag not found in system.</string>
 
     <!-- Back confirmation -->
     <string name="confirm_leave_screen">Leave this screen? Unsaved data will be lost.</string>

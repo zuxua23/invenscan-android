@@ -63,6 +63,9 @@ interface ApiService {
     @POST("api/tag/register")
     suspend fun registerTags(@Body request: TagRegisterRequest): Response<ApiResponse<Unit>>
 
+    @POST("api/tag/reregister")
+    suspend fun reregisterTag(@Body body: Map<String, String>): Response<ApiResponse<Unit>>
+
     // ── Stock In ──────────────────────────────────────────────────
 
     @GET("api/stockin")
