@@ -6,7 +6,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Singleton
+import android.content.Context
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -14,5 +17,6 @@ object ScannerModule {
 
     @Provides
     @Singleton
-    fun provideBatteryProvider(): BatteryProvider = MockBatteryProvider()
+    fun provideBatteryProvider(@ApplicationContext context: Context): BatteryProvider =
+        MockBatteryProvider(context)
 }

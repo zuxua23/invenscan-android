@@ -196,7 +196,6 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <!-- Row 3: Search Item | Settings -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -238,9 +237,8 @@
                             android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardSettings"
+                    android:id="@+id/cardTagRegistration"
                     android:layout_width="0dp"
                     android:layout_height="110dp"
                     android:layout_marginStart="8dp"
@@ -261,19 +259,20 @@
                         <ImageView
                             android:layout_width="28dp"
                             android:layout_height="28dp"
-                            android:src="@drawable/ic_settings"
+                            android:src="@drawable/ic_plug"
                             app:tint="@color/teal_primary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="@string/action_settings"
+                            android:text="@string/menu_tag_registration"
                             android:textColor="@color/text_primary"
                             android:textSize="11sp"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
             </LinearLayout>
 
             <!-- Row 4: RFID Settings | Tag Registration -->
@@ -318,9 +317,8 @@
                             android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardTagRegistration"
+                    android:id="@+id/cardSettings"
                     android:layout_width="0dp"
                     android:layout_height="110dp"
                     android:layout_marginStart="8dp"
@@ -341,19 +339,20 @@
                         <ImageView
                             android:layout_width="28dp"
                             android:layout_height="28dp"
-                            android:src="@drawable/ic_plug"
+                            android:src="@drawable/ic_settings"
                             app:tint="@color/teal_primary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="@string/menu_tag_registration"
+                            android:text="@string/action_settings"
                             android:textColor="@color/text_primary"
                             android:textSize="11sp"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
             </LinearLayout>
 
             <!-- Sync status bar -->

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
+import com.invenscan.app.util.SessionManager
 import com.invenscan.app.R
 import com.invenscan.app.base.BaseActivity
 import com.invenscan.app.databinding.ActivityHomeBinding
@@ -78,6 +79,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding>() {
                     negativeText = getString(R.string.dialog_cancel),
                     onPositive = {
                         appLogger.logLogout(prefManager.userId ?: "")
+                        SessionManager.isActive = false
                         viewModel.logout()
                         startActivity(Intent(this, LoginActivity::class.java).apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

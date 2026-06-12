@@ -1,7 +1,7 @@
 package com.invenscan.app.ui.login
 
 import android.content.Intent
-import android.os.Bundle
+import com.invenscan.app.util.SessionManager
 import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
@@ -12,10 +12,8 @@ import com.invenscan.app.base.BaseActivity
 import com.invenscan.app.base.Resource
 import com.invenscan.app.databinding.ActivityLoginBinding
 import com.invenscan.app.ui.home.HomeActivity
-import com.invenscan.app.util.PrefManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginActivity : BaseActivity<ActivityLoginBinding>() {
@@ -25,7 +23,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
     override fun inflateBinding() = ActivityLoginBinding.inflate(layoutInflater)
 
     override fun initView() {
-        if (prefManager.isLoggedIn) {
+        if (prefManager.isLoggedIn && SessionManager.isActive) {
             navigateToHome()
             return
         }
@@ -61,6 +59,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
                             is Resource.Loading -> showLoading(true)
                             is Resource.Success -> {
                                 showLoading(false)
+                                SessionManager.isActive = true
                                 appLogger.logLogin(prefManager.userId ?: "")
                                 navigateToHome()
                             }
