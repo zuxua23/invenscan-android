@@ -5,6 +5,9 @@ import com.google.gson.annotations.SerializedName
 data class StockTakingModel(
     @SerializedName("id") val id: Long,
     @SerializedName("sessionCode") val sessionCode: String,
+    @SerializedName("locationId") val locationId: Long,
+    @SerializedName("locationCode") val locationCode: String?,
+    @SerializedName("locationName") val locationName: String?,
     @SerializedName("remark") val remark: String?,
     @SerializedName("status") val status: String,
     @SerializedName("createdBy") val createdBy: String?,

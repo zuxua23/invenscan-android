@@ -17,18 +17,34 @@ class StockTakingRepository @Inject constructor(
     private val appDao: AppDao
 ) {
 
-    suspend fun getActiveSession(): Resource<StockTakingModel> {
+    suspend fun getActiveSession(locationId: Long): Resource<StockTakingModel> {
         return try {
-            val response = apiService.getActiveStockTakingSession()
+            val response = apiService.getActiveStockTakingSession(locationId)
             if (response.isSuccessful && response.body()?.success == true) {
                 val data = response.body()!!.data
                 if (data != null) Resource.Success(data)
-                else Resource.Error("Tidak ada sesi aktif")
+                else Resource.Error("No active session at this location")
             } else {
-                Resource.Error(response.body()?.message ?: "Tidak ada sesi aktif")
+                Resource.Error(response.body()?.message ?: "No active session at this location")
             }
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Gagal terhubung ke server")
+            Resource.Error(e.message ?: "Failed to connect to server")
+        }
+    }
+
+    suspend fun createSession(locationId: Long, remark: String): Resource<StockTakingModel> {
+        return try {
+            val body = mapOf<String, Any>("locationId" to locationId, "remark" to remark)
+            val response = apiService.createStockTakingSession(body)
+            if (response.isSuccessful && response.body()?.success == true) {
+                val data = response.body()!!.data
+                if (data != null) Resource.Success(data)
+                else Resource.Error("Failed to create session")
+            } else {
+                Resource.Error(response.body()?.message ?: "Failed to create session")
+            }
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Failed to connect to server")
         }
     }
 
@@ -38,10 +54,10 @@ class StockTakingRepository @Inject constructor(
             if (response.isSuccessful && response.body()?.success == true) {
                 Resource.Success(response.body()!!.data ?: emptyList())
             } else {
-                Resource.Error(response.body()?.message ?: "Gagal memuat data sesi")
+                Resource.Error(response.body()?.message ?: "Failed to load session data")
             }
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Gagal terhubung ke server")
+            Resource.Error(e.message ?: "Failed to connect to server")
         }
     }
 
@@ -51,10 +67,10 @@ class StockTakingRepository @Inject constructor(
             if (response.isSuccessful && response.body()?.success == true) {
                 Resource.Success(Unit)
             } else {
-                Resource.Error(response.body()?.message ?: "Gagal submit hasil")
+                Resource.Error(response.body()?.message ?: "Failed to submit results")
             }
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Gagal terhubung ke server")
+            Resource.Error(e.message ?: "Failed to connect to server")
         }
     }
 

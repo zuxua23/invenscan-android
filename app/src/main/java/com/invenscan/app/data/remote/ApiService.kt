@@ -97,13 +97,13 @@ interface ApiService {
     // ── Stock Taking ──────────────────────────────────────────────
 
     @POST("api/stock-taking")
-    suspend fun createStockTakingSession(@Body body: Map<String, String>): Response<ApiResponse<StockTakingModel>>
+    suspend fun createStockTakingSession(@Body body: Map<String, Any>): Response<ApiResponse<StockTakingModel>>
 
     @GET("api/stock-taking")
     suspend fun getStockTakingSessions(): Response<ApiResponse<List<StockTakingModel>>>
 
     @GET("api/stock-taking/active")
-    suspend fun getActiveStockTakingSession(): Response<ApiResponse<StockTakingModel>>
+    suspend fun getActiveStockTakingSession(@Query("locationId") locationId: Long): Response<ApiResponse<StockTakingModel>>
 
     @GET("api/stock-taking/tags/{sttId}")
     suspend fun getStockTakingTags(@Path("sttId") sttId: Long): Response<ApiResponse<List<StockTakingTagModel>>>

@@ -61,9 +61,14 @@
     <!-- Stock Taking -->
     <string name="title_stock_taking">Stock Taking</string>
     <string name="empty_no_active_session">No active session at this time</string>
+    <string name="empty_no_active_session_location">No active session at this location.\nCreate a new session to start.</string>
     <string name="label_session_code">Session Code</string>
     <string name="label_session_date">Date</string>
     <string name="label_session_remark">Remark</string>
+    <string name="label_active_session">ACTIVE SESSION</string>
+    <string name="label_select_warehouse">Select Warehouse / Location</string>
+    <string name="action_join_session">Join Session</string>
+    <string name="action_create_session">Create New Session</string>
     <string name="action_start_session">Start Scan</string>
     <string name="action_retry">Retry</string>
 

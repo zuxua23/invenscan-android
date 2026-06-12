@@ -50,7 +50,11 @@ class StockTakingDetailActivity : BaseActivity<ActivityStockTakingDetailBinding>
 
         val sttId = intent.getLongExtra(EXTRA_STT_ID, 0L)
         val sessionCode = intent.getStringExtra(EXTRA_SESSION_CODE) ?: ""
+        val locationName = intent.getStringExtra(EXTRA_LOCATION_NAME)
         supportActionBar?.title = sessionCode
+        if (!locationName.isNullOrBlank()) {
+            supportActionBar?.subtitle = locationName
+        }
 
         binding.rvScanResults.adapter = scanResultAdapter
 
@@ -190,5 +194,7 @@ class StockTakingDetailActivity : BaseActivity<ActivityStockTakingDetailBinding>
     companion object {
         const val EXTRA_STT_ID = "extra_stt_id"
         const val EXTRA_SESSION_CODE = "extra_session_code"
+        const val EXTRA_LOCATION_ID = "extra_location_id"
+        const val EXTRA_LOCATION_NAME = "extra_location_name"
     }
 }
