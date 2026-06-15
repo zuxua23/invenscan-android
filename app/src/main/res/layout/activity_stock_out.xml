@@ -68,9 +68,9 @@
 
             <Spinner
                 android:id="@+id/spinnerPower"
-                android:layout_width="90dp"
+                android:layout_width="72dp"
                 android:layout_height="32dp"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="6dp"
                 android:background="@drawable/bg_card"
                 android:paddingStart="8dp"
                 android:paddingEnd="4dp"
@@ -246,7 +246,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="80dp"
+        android:layout_margin="16dp"
         android:contentDescription="@string/title_camera_scan"
         android:src="@drawable/ic_camera"
         app:backgroundTint="@color/navy"
