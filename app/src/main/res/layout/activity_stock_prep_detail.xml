@@ -141,7 +141,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="80dp"
+        android:layout_margin="16dp"
         android:contentDescription="@string/title_camera_scan"
         android:src="@drawable/ic_camera"
         app:backgroundTint="@color/navy"
