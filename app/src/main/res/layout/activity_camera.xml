@@ -72,12 +72,12 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnFlash"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/Widget.MaterialComponents.Button.IconButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="⚡"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            app:icon="@drawable/ic_flash"
+            app:iconTint="@android:color/white"
+            app:iconSize="20dp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
