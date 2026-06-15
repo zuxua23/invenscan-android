@@ -91,7 +91,7 @@ class StockInActivity : BaseActivity<ActivityStockInBinding>(), ScannerContract.
 
     private fun setupPowerSpinner() {
         val powerLabels = powerValues.map { "$it dBm" }
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, powerLabels).apply {
+        val adapter = ArrayAdapter(this, R.layout.item_spinner_small, powerLabels).apply {
             setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
         binding.spinnerPower.adapter = adapter

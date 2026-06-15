@@ -99,7 +99,7 @@ class StockOutActivity : BaseActivity<ActivityStockOutBinding>(), ScannerContrac
 
     private fun setupPowerSpinner() {
         val powerLabels = powerValues.map { "$it dBm" }
-        binding.spinnerPower.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, powerLabels).apply {
+        binding.spinnerPower.adapter = ArrayAdapter(this, R.layout.item_spinner_small, powerLabels).apply {
             setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
         val idx = powerValues.indexOf(prefManager.rfidPower).coerceAtLeast(0)
