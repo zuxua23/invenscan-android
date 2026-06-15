@@ -70,14 +70,15 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
-        <com.google.android.material.button.MaterialButton
+        <ImageButton
             android:id="@+id/btnFlash"
-            style="@style/Widget.MaterialComponents.Button.IconButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_flash"
-            app:iconTint="@android:color/white"
-            app:iconSize="20dp" />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_flash"
+            android:tint="@android:color/white"
+            android:contentDescription="@string/action_toggle_flash"
+            android:padding="12dp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
