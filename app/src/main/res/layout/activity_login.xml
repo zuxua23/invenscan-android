@@ -88,7 +88,7 @@
                         android:layout_height="48dp"
                         android:minWidth="0dp"
                         android:paddingHorizontal="4dp"
-                        app:icon="@drawable/ic_plug"
+                        app:icon="@drawable/ic_link"
                         app:iconGravity="textStart"
                         app:iconPadding="0dp"
                         app:iconSize="20dp" />
